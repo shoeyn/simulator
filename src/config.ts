@@ -15,12 +15,16 @@ import { AuthoriseError } from "./types/authorise-errors";
 import ReturnCode from "./types/return-code";
 import { UserIdentityClaim } from "./types/user-info";
 
+export type UserConfiguration = {
+  error: ErrorConfiguration;
+  response: ResponseConfiguration
+}
+
 export class Config {
   private static instance: Config;
 
+  private userConfigurations: UserConfiguration[] = []
   private clientConfiguration: ClientConfiguration;
-  private responseConfiguration: ResponseConfiguration;
-  private errorConfiguration: ErrorConfiguration;
   private authCodeRequestParamsStore: Record<string, AuthRequestParameters>;
   private accessTokenStore: AccessTokenStore;
 
@@ -66,73 +70,80 @@ CQIDAQAB
         : ["P0", "P2"],
     };
 
-    this.responseConfiguration = {
-      sub:
-        process.env.SUB ??
-        "urn:fdc:gov.uk:2022:56P4CMsGh_02YOlWpd8PAOI-2sVlB2nsNU7mcLZYhYw=",
-      email: process.env.EMAIL ?? "test@example.com",
-      emailVerified: process.env.EMAIL_VERIFIED !== "false",
-      phoneNumber: process.env.PHONE_NUMBER ?? "07123456789",
-      phoneNumberVerified: process.env.PHONE_NUMBER_VERIFIED !== "false",
-      maxLoCAchieved: "P2",
-      coreIdentityVerifiableCredentials: {
-        type: ["VerifiableCredential", "IdentityCheckCredential"],
-        credentialSubject: {
-          name: [
-            {
-              nameParts: [
-                {
-                  value: "GEOFFREY",
-                  type: "GivenName",
-                },
-                {
-                  value: "HEARNSHAW",
-                  type: "FamilyName",
-                },
-              ],
-            },
-          ],
-          birthDate: [
-            {
-              value: "1955-04-19",
-            },
-          ],
-        },
-      },
-      passportDetails: null,
-      drivingPermitDetails: null,
-      socialSecurityRecordDetails: null,
-      postalAddressDetails: [
-        {
-          addressCountry: "GB",
-          buildingName: "",
-          streetName: "FRAMPTON ROAD",
-          postalCode: "GL1 5QB",
-          buildingNumber: "26",
-          addressLocality: "GLOUCESTER",
-          validFrom: "2000-01-01",
-          uprn: 100120472196,
-          subBuildingName: "",
-        },
-      ],
-      returnCodes: [],
-    };
+    const userConfiguration = Config.newUserConfig();
 
-    this.errorConfiguration = {
-      coreIdentityErrors:
-        process.env.CORE_IDENTITY_ERRORS?.split(",").filter(
-          isCoreIdentityError
-        ) ?? [],
-      idTokenErrors:
-        process.env.ID_TOKEN_ERRORS?.split(",").filter(isIdTokenError) ?? [],
-      authoriseErrors:
-        process.env.AUTHORISE_ERRORS?.split(",").filter(isAuthoriseError) ?? [],
-    };
+    this.userConfigurations.push(userConfiguration);
 
     this.authCodeRequestParamsStore = {};
     this.accessTokenStore = {};
 
     this.simulatorUrl = process.env.SIMULATOR_URL ?? "http://localhost:3000";
+  }
+
+  public static newUserConfig(): UserConfiguration {
+    return {
+      response: {
+        sub:
+          process.env.SUB ??
+          "urn:fdc:gov.uk:2022:56P4CMsGh_02YOlWpd8PAOI-2sVlB2nsNU7mcLZYhYw=",
+        email: process.env.EMAIL ?? "test@example.com",
+        emailVerified: process.env.EMAIL_VERIFIED !== "false",
+        phoneNumber: process.env.PHONE_NUMBER ?? "07123456789",
+        phoneNumberVerified: process.env.PHONE_NUMBER_VERIFIED !== "false",
+        maxLoCAchieved: "P2",
+        coreIdentityVerifiableCredentials: {
+          type: ["VerifiableCredential", "IdentityCheckCredential"],
+          credentialSubject: {
+            name: [
+              {
+                nameParts: [
+                  {
+                    value: "GEOFFREY",
+                    type: "GivenName",
+                  },
+                  {
+                    value: "HEARNSHAW",
+                    type: "FamilyName",
+                  },
+                ],
+              },
+            ],
+            birthDate: [
+              {
+                value: "1955-04-19",
+              },
+            ],
+          },
+        },
+        passportDetails: null,
+        drivingPermitDetails: null,
+        socialSecurityRecordDetails: null,
+        postalAddressDetails: [
+          {
+            addressCountry: "GB",
+            buildingName: "",
+            streetName: "FRAMPTON ROAD",
+            postalCode: "GL1 5QB",
+            buildingNumber: "26",
+            addressLocality: "GLOUCESTER",
+            validFrom: "2000-01-01",
+            uprn: 100120472196,
+            subBuildingName: "",
+          },
+        ],
+        returnCodes: [],
+      },
+      error: {
+        coreIdentityErrors:
+          process.env.CORE_IDENTITY_ERRORS?.split(",").filter(
+            isCoreIdentityError
+          ) ?? [],
+        idTokenErrors:
+          process.env.ID_TOKEN_ERRORS?.split(",").filter(isIdTokenError) ?? [],
+        authoriseErrors:
+          process.env.AUTHORISE_ERRORS?.split(",").filter(isAuthoriseError) ?? [],
+      }
+    };
   }
 
   public static getInstance(): Config {
@@ -144,6 +155,30 @@ CQIDAQAB
 
   public static resetInstance(): void {
     Config.instance = new Config();
+  }
+
+  public static getUserConfiguration(sub: string): UserConfiguration {
+    const config = Config.getInstance();
+
+    const userConfig = config.userConfigurations.find(u => u.response.sub === sub);
+    if (userConfig) {
+      return userConfig;
+    }
+    
+    const newConfig = Config.newUserConfig();
+    newConfig.response.sub = sub;
+    config.userConfigurations.push(newConfig);
+    
+    return newConfig;
+  }
+
+  public static deleteUserConfiguration(sub: string): void {
+    const config = Config.getInstance();
+    const i = config.userConfigurations.findIndex(u => u.response.sub === sub);
+
+    if (i > -1) {
+      config.userConfigurations.splice(i);
+    }
   }
 
   public getClientConfiguration(): ClientConfiguration {
@@ -225,110 +260,108 @@ CQIDAQAB
     this.clientConfiguration.clientLoCs = clientLoCs;
   }
 
-  public getResponseConfiguration(): ResponseConfiguration {
-    return this.responseConfiguration;
+  public getResponseConfiguration(userConfig: UserConfiguration): ResponseConfiguration {
+    return userConfig.response;
   }
 
-  public getSub(): string {
-    return this.responseConfiguration.sub!;
+  public getUserConfigurations(): UserConfiguration[] {
+    return this.userConfigurations;
   }
 
-  public setSub(sub: string): void {
-    this.responseConfiguration.sub = sub;
+  public getEmail(userConfig: UserConfiguration): string {
+    return userConfig.response.email!;
   }
 
-  public getEmail(): string {
-    return this.responseConfiguration.email!;
+  public setEmail(userConfig: UserConfiguration, email: string): void {
+    userConfig.response.email = email;
   }
 
-  public setEmail(email: string): void {
-    this.responseConfiguration.email = email;
+  public getEmailVerified(userConfig: UserConfiguration): boolean {
+    return userConfig.response.emailVerified!;
   }
 
-  public getEmailVerified(): boolean {
-    return this.responseConfiguration.emailVerified!;
+  public setEmailVerified(userConfig: UserConfiguration, emailVerified: boolean): void {
+    userConfig.response.emailVerified = emailVerified;
   }
 
-  public setEmailVerified(emailVerified: boolean): void {
-    this.responseConfiguration.emailVerified = emailVerified;
+  public getPhoneNumber(userConfig: UserConfiguration): string {
+    return userConfig.response.phoneNumber!;
   }
 
-  public getPhoneNumber(): string {
-    return this.responseConfiguration.phoneNumber!;
+  public setPhoneNumber(userConfig: UserConfiguration, phoneNumber: string): void {
+    userConfig.response.phoneNumber = phoneNumber;
   }
 
-  public setPhoneNumber(phoneNumber: string): void {
-    this.responseConfiguration.phoneNumber = phoneNumber;
+  public getPhoneNumberVerified(userConfig: UserConfiguration): boolean {
+    return userConfig.response.phoneNumberVerified!;
   }
 
-  public getPhoneNumberVerified(): boolean {
-    return this.responseConfiguration.phoneNumberVerified!;
+  public setPhoneNumberVerified(userConfig: UserConfiguration, phoneNumberVerified: boolean): void {
+    userConfig.response.phoneNumberVerified = phoneNumberVerified;
   }
 
-  public setPhoneNumberVerified(phoneNumberVerified: boolean): void {
-    this.responseConfiguration.phoneNumberVerified = phoneNumberVerified;
+  public getMaxLoCAchieved(userConfig: UserConfiguration): string {
+    return userConfig.response.maxLoCAchieved!;
   }
 
-  public getMaxLoCAchieved(): string {
-    return this.responseConfiguration.maxLoCAchieved!;
+  public setMaxLoCAchieved(userConfig: UserConfiguration, maxLoCAchieved: string): void {
+    userConfig.response.maxLoCAchieved = maxLoCAchieved;
   }
 
-  public setMaxLoCAchieved(maxLoCAchieved: string): void {
-    this.responseConfiguration.maxLoCAchieved = maxLoCAchieved;
-  }
-
-  public getVerifiableIdentityCredentials(): object | null {
-    return this.responseConfiguration.coreIdentityVerifiableCredentials!;
+  public getVerifiableIdentityCredentials(userConfig: UserConfiguration): object | null {
+    return userConfig.response.coreIdentityVerifiableCredentials!;
   }
 
   public setVerifiableIdentityCredentials(
+    userConfig: UserConfiguration,
     coreIdentityVerifiableCredentials: object | null
   ): void {
-    this.responseConfiguration.coreIdentityVerifiableCredentials =
+    userConfig.response.coreIdentityVerifiableCredentials =
       coreIdentityVerifiableCredentials;
   }
 
-  public getPassportDetails(): object[] | null {
-    return this.responseConfiguration.passportDetails!;
+  public getPassportDetails(userConfig: UserConfiguration): object[] | null {
+    return userConfig.response.passportDetails!;
   }
 
-  public setPassportDetails(passportDetails: object[] | null): void {
-    this.responseConfiguration.passportDetails = passportDetails;
+  public setPassportDetails(userConfig: UserConfiguration, passportDetails: object[] | null): void {
+    userConfig.response.passportDetails = passportDetails;
   }
 
-  public getDrivingPermitDetails(): object[] | null {
-    return this.responseConfiguration.drivingPermitDetails!;
+  public getDrivingPermitDetails(userConfig: UserConfiguration): object[] | null {
+    return userConfig.response.drivingPermitDetails!;
   }
 
-  public setDrivingPermitDetails(drivingPermitDetails: object[] | null): void {
-    this.responseConfiguration.drivingPermitDetails = drivingPermitDetails;
+  public setDrivingPermitDetails(userConfig: UserConfiguration, drivingPermitDetails: object[] | null): void {
+    userConfig.response.drivingPermitDetails = drivingPermitDetails;
   }
 
-  public getSocialSecurityRecordDetails(): object[] | null {
-    return this.responseConfiguration.socialSecurityRecordDetails!;
+  public getSocialSecurityRecordDetails(userConfig: UserConfiguration): object[] | null {
+    return userConfig.response.socialSecurityRecordDetails!;
   }
 
   public setSocialSecurityRecordDetails(
+    userConfig: UserConfiguration,
     socialSecurityRecordDetails: object[] | null
   ): void {
-    this.responseConfiguration.socialSecurityRecordDetails =
+    userConfig.response.socialSecurityRecordDetails =
       socialSecurityRecordDetails;
   }
 
-  public getPostalAddressDetails(): object[] | null {
-    return this.responseConfiguration.postalAddressDetails!;
+  public getPostalAddressDetails(userConfig: UserConfiguration): object[] | null {
+    return userConfig.response.postalAddressDetails!;
   }
 
-  public setPostalAddressDetails(postalAddressDetails: object[] | null): void {
-    this.responseConfiguration.postalAddressDetails = postalAddressDetails;
+  public setPostalAddressDetails(userConfig: UserConfiguration, postalAddressDetails: object[] | null): void {
+    userConfig.response.postalAddressDetails = postalAddressDetails;
   }
 
-  public getReturnCodes(): ReturnCode[] | null {
-    return this.responseConfiguration.returnCodes!;
+  public getReturnCodes(userConfig: UserConfiguration): ReturnCode[] | null {
+    return userConfig.response.returnCodes!;
   }
 
-  public setReturnCodes(returnCodes: ReturnCode[] | null): void {
-    this.responseConfiguration.returnCodes = returnCodes;
+  public setReturnCodes(userConfig: UserConfiguration, returnCodes: ReturnCode[] | null): void {
+    userConfig.response.returnCodes = returnCodes;
   }
 
   public getAuthCodeRequestParams(
@@ -364,32 +397,32 @@ CQIDAQAB
     ];
   }
 
-  public getErrorConfiguration(): ErrorConfiguration {
-    return this.errorConfiguration;
+  public getErrorConfiguration(userConfig: UserConfiguration): ErrorConfiguration {
+    return userConfig.error;
   }
 
-  public getCoreIdentityErrors(): CoreIdentityError[] {
-    return this.errorConfiguration.coreIdentityErrors!;
+  public getCoreIdentityErrors(userConfig: UserConfiguration): CoreIdentityError[] {
+    return userConfig.error.coreIdentityErrors!;
   }
 
-  public setCoreIdentityErrors(coreIdentityErrors: CoreIdentityError[]): void {
-    this.errorConfiguration.coreIdentityErrors = coreIdentityErrors;
+  public setCoreIdentityErrors(userConfig: UserConfiguration, coreIdentityErrors: CoreIdentityError[]): void {
+    userConfig.error.coreIdentityErrors = coreIdentityErrors;
   }
 
-  public getIdTokenErrors(): IdTokenError[] {
-    return this.errorConfiguration.idTokenErrors!;
+  public getIdTokenErrors(userConfig: UserConfiguration): IdTokenError[] {
+    return userConfig.error.idTokenErrors!;
   }
 
-  public setIdTokenErrors(idTokenErrors: IdTokenError[]): void {
-    this.errorConfiguration.idTokenErrors = idTokenErrors;
+  public setIdTokenErrors(userConfig: UserConfiguration, idTokenErrors: IdTokenError[]): void {
+    userConfig.error.idTokenErrors = idTokenErrors;
   }
 
-  public getAuthoriseErrors(): AuthoriseError[] {
-    return this.errorConfiguration.authoriseErrors!;
+  public getAuthoriseErrors(userConfig: UserConfiguration): AuthoriseError[] {
+    return userConfig.error.authoriseErrors!;
   }
 
-  public setAuthoriseErrors(authoriseErrors: AuthoriseError[]): void {
-    this.errorConfiguration.authoriseErrors = authoriseErrors;
+  public setAuthoriseErrors(userConfig: UserConfiguration, authoriseErrors: AuthoriseError[]): void {
+    userConfig.error.authoriseErrors = authoriseErrors;
   }
 
   public getSimulatorUrl(): string {

@@ -13,25 +13,27 @@ import AuthRequestParameters from "../../../../types/auth-request-parameters";
 import { createIdToken } from "../../helper/create-id-token";
 
 describe("createIdToken tests", () => {
+  const testSubClaim =
+    "urn:fdc:gov.uk:2022:56P4CMsGh_02YOlWpd8PAOI-2sVlB2nsNU7mcLZYhYw=";
   const mockAuthRequestParams: AuthRequestParameters = {
-    claims: [],
-    nonce: "nonce-1238rhbh4r84=4rij=r4r",
-    scopes: ["openid"],
-    redirectUri: "https://example.com/authentication-callback/",
-    vtr: {
-      credentialTrust: "Cl.Cm",
-      levelOfConfidence: null,
-    },
+    sub: testSubClaim,
+    params: {
+      claims: [],
+      nonce: "nonce-1238rhbh4r84=4rij=r4r",
+      scopes: ["openid"],
+      redirectUri: "https://example.com/authentication-callback/",
+      vtr: {
+        credentialTrust: "Cl.Cm",
+        levelOfConfidence: null,
+      },
+    }
   };
   const testTimestampMs = 1723707024;
   const testClientId = "testClientId";
-  const testSubClaim =
-    "urn:fdc:gov.uk:2022:56P4CMsGh_02YOlWpd8PAOI-2sVlB2nsNU7mcLZYhYw=";
   const testAccessToken =
     "eyJhbGciOiJSUzI1NiIsImtpZCI6IjczMzRiNzE4LTNmMjktNDRlZi04YjY1LWUyNjZhMTdkYWVhNSJ9.eyJleHAiOjkzNjQ4OTc4MSwiaWF0Ijo5MzY0ODk2MDEsImlzcyI6Imh0dHBzOi8vb2lkYy50ZXN0LmFjY291bnQuZ292LnVrIiwianRpIjoiMTIzNDU2NyIsImNsaWVudF9pZCI6InRlc3RDbGllbnRJZCIsInN1YiI6InVybjpmZGM6Z292LnVrOjIwMjI6NTZQNENNc0doXzAyWU9sV3BkOFBBT0ktMnNWbEIybnNOVTdtY0xaWWhZdz0iLCJzaWQiOiIxMjM0NTY3Iiwic2NvcGUiOlsib3BlbmlkIl19.GDDz3DcWSUCWMT8OkxZvU8ffiAjOKcNNaW23RzlEBer3G4Xz5Sp7moGtbP4vcfXT_pLUy-_YTIsiJ9r-A1gchhmx_qbfnWcqHxwj3DFYZ_Q16XgpB_7o_MtsiY1aAhqd8-zywTg25aczMHPtZMLVdYx9vw8zlF9iI9sOscS-s5Bje1yZ6ZmbHseHYVa8yJmZIjoKcdnGQXQwGQFp1KyzkA2gJxnR19Nc8O9oM4PA5y6uBCme3YTknei3T3tfJrPiBevtdvr9SV5fBTK2MrPzHao51_8nT841TdnMbHWxYp0FHTiBw7aAQO2VoKQ6Zku5CqBd3dyeQy_sZDNOFrDOTA";
 
   const clientIdSpy = jest.spyOn(Config.getInstance(), "getClientId");
-  const subSpy = jest.spyOn(Config.getInstance(), "getSub");
   const tokenSigningAlgorithmSpy = jest.spyOn(
     Config.getInstance(),
     "getIdTokenSigningAlgorithm"
@@ -52,7 +54,6 @@ describe("createIdToken tests", () => {
 
   it("returns a signed Id token using RS256", async () => {
     tokenSigningAlgorithmSpy.mockReturnValue("RS256");
-    subSpy.mockReturnValue(testSubClaim);
     clientIdSpy.mockReturnValue(testClientId);
 
     const IdToken = await createIdToken(mockAuthRequestParams, testAccessToken);
@@ -76,7 +77,7 @@ describe("createIdToken tests", () => {
       at_hash: "oB7bgQoIL9clDcgMdS4Ydg",
       vtm: "http://localhost:3000/trustmark",
       vot: "Cl.Cm",
-      nonce: mockAuthRequestParams.nonce,
+      nonce: mockAuthRequestParams.params.nonce,
       auth_time: Math.floor(testTimestampMs / 1000),
     });
     expect(typeof tokenParts[2]).toBe("string");
@@ -84,7 +85,6 @@ describe("createIdToken tests", () => {
 
   it("returns a signed Id Token using ES256", async () => {
     tokenSigningAlgorithmSpy.mockReturnValue("ES256");
-    subSpy.mockReturnValue(testSubClaim);
     clientIdSpy.mockReturnValue(testClientId);
 
     const idToken = await createIdToken(mockAuthRequestParams, testAccessToken);
@@ -107,8 +107,8 @@ describe("createIdToken tests", () => {
       sid: SESSION_ID,
       at_hash: "oB7bgQoIL9clDcgMdS4Ydg",
       vtm: "http://localhost:3000/trustmark",
-      vot: mockAuthRequestParams.vtr.credentialTrust,
-      nonce: mockAuthRequestParams.nonce,
+      vot: mockAuthRequestParams.params.vtr.credentialTrust,
+      nonce: mockAuthRequestParams.params.nonce,
       auth_time: Math.floor(testTimestampMs / 1000),
     });
     expect(typeof tokenParts[2]).toBe("string");
@@ -116,7 +116,6 @@ describe("createIdToken tests", () => {
 
   it("returns an invalid header if the client config has enabled INVALID_ALG_HEADER", async () => {
     tokenSigningAlgorithmSpy.mockReturnValue("ES256");
-    subSpy.mockReturnValue(testSubClaim);
     clientIdSpy.mockReturnValue(testClientId);
     idTokenErrorSpy.mockReturnValue(["INVALID_ALG_HEADER"]);
 
@@ -133,7 +132,6 @@ describe("createIdToken tests", () => {
 
   it("returns an invalid signature if the client config has enabled INVALID_SIGNATURE", async () => {
     tokenSigningAlgorithmSpy.mockReturnValue("ES256");
-    subSpy.mockReturnValue(testSubClaim);
     clientIdSpy.mockReturnValue(testClientId);
     idTokenErrorSpy.mockReturnValue(["INVALID_SIGNATURE"]);
 
@@ -148,7 +146,6 @@ describe("createIdToken tests", () => {
 
   it("returns a token with iat in the future if the client config has enabled TOKEN_NOT_VALID_YET", async () => {
     tokenSigningAlgorithmSpy.mockReturnValue("ES256");
-    subSpy.mockReturnValue(testSubClaim);
     clientIdSpy.mockReturnValue(testClientId);
     idTokenErrorSpy.mockReturnValue(["TOKEN_NOT_VALID_YET"]);
 
@@ -162,7 +159,6 @@ describe("createIdToken tests", () => {
 
   it("returns an expired token if the client config has enabled TOKEN_EXPIRED", async () => {
     tokenSigningAlgorithmSpy.mockReturnValue("ES256");
-    subSpy.mockReturnValue(testSubClaim);
     clientIdSpy.mockReturnValue(testClientId);
     idTokenErrorSpy.mockReturnValue(["TOKEN_EXPIRED"]);
 
@@ -176,20 +172,18 @@ describe("createIdToken tests", () => {
 
   it("returns an invalid vot if the client config has enabled INCORRECT_VOT", async () => {
     tokenSigningAlgorithmSpy.mockReturnValue("ES256");
-    subSpy.mockReturnValue(testSubClaim);
     clientIdSpy.mockReturnValue(testClientId);
     idTokenErrorSpy.mockReturnValue(["INCORRECT_VOT"]);
 
     const idToken = await createIdToken(mockAuthRequestParams, testAccessToken);
 
     const payload = decodeTokenPart(idToken.split(".")[1]);
-    expect(payload.vot).not.toEqual(mockAuthRequestParams.vtr.credentialTrust);
+    expect(payload.vot).not.toEqual(mockAuthRequestParams.params.vtr.credentialTrust);
     expect(payload.vot).toBe("Cl");
   });
 
   it("returns an invalid aud if the client config has enabled INVALID_AUD", async () => {
     tokenSigningAlgorithmSpy.mockReturnValue("ES256");
-    subSpy.mockReturnValue(testSubClaim);
     clientIdSpy.mockReturnValue(testClientId);
     idTokenErrorSpy.mockReturnValue(["INVALID_AUD"]);
 
@@ -201,7 +195,6 @@ describe("createIdToken tests", () => {
 
   it("returns an invalid iss if the client config has enabled INVALID_ISS", async () => {
     tokenSigningAlgorithmSpy.mockReturnValue("ES256");
-    subSpy.mockReturnValue(testSubClaim);
     clientIdSpy.mockReturnValue(testClientId);
     idTokenErrorSpy.mockReturnValue(["INVALID_ISS"]);
 
@@ -214,13 +207,12 @@ describe("createIdToken tests", () => {
 
   it("returns an invalid nonce if the client config has enabled NONCE_NOT_MATCHING", async () => {
     tokenSigningAlgorithmSpy.mockReturnValue("ES256");
-    subSpy.mockReturnValue(testSubClaim);
     clientIdSpy.mockReturnValue(testClientId);
     idTokenErrorSpy.mockReturnValue(["NONCE_NOT_MATCHING"]);
 
     const idToken = await createIdToken(mockAuthRequestParams, testAccessToken);
 
     const payload = decodeTokenPart(idToken.split(".")[1]);
-    expect(payload.iss).not.toEqual(mockAuthRequestParams.nonce);
+    expect(payload.iss).not.toEqual(mockAuthRequestParams.params.nonce);
   });
 });

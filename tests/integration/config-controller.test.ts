@@ -59,6 +59,7 @@ describe("Integration: Config POST", () => {
     expect(response.status).toEqual(200);
 
     const config = Config.getInstance();
+    const userConfig = Config.getUserConfiguration(TEST_SUB);
 
     expect(config.getClientId()).toEqual(TEST_CLIENT_ID);
     expect(config.getPublicKey()).toEqual(TEST_PUBLIC_KEY);
@@ -75,16 +76,15 @@ describe("Integration: Config POST", () => {
       TEST_ID_TOKEN_SIGNING_ALGORITHM
     );
     expect(config.getClientLoCs()).toEqual(TEST_CLIENT_LOCS);
-    expect(config.getSub()).toEqual(TEST_SUB);
-    expect(config.getEmail()).toEqual(TEST_EMAIL);
-    expect(config.getEmailVerified()).toEqual(TEST_EMAIL_VERIFIED);
-    expect(config.getPhoneNumber()).toEqual(TEST_PHONE_NUMBER);
-    expect(config.getPhoneNumberVerified()).toEqual(TEST_PHONE_NUMBER_VERIFIED);
-    expect(config.getCoreIdentityErrors()).toStrictEqual([
+    expect(config.getEmail(userConfig)).toEqual(TEST_EMAIL);
+    expect(config.getEmailVerified(userConfig)).toEqual(TEST_EMAIL_VERIFIED);
+    expect(config.getPhoneNumber(userConfig)).toEqual(TEST_PHONE_NUMBER);
+    expect(config.getPhoneNumberVerified(userConfig)).toEqual(TEST_PHONE_NUMBER_VERIFIED);
+    expect(config.getCoreIdentityErrors(userConfig)).toStrictEqual([
       "INVALID_ALG_HEADER",
     ]);
-    expect(config.getIdTokenErrors()).toStrictEqual(["INVALID_ISS"]);
-    expect(config.getAuthoriseErrors()).toStrictEqual(["ACCESS_DENIED"]);
+    expect(config.getIdTokenErrors(userConfig)).toStrictEqual(["INVALID_ISS"]);
+    expect(config.getAuthoriseErrors(userConfig)).toStrictEqual(["ACCESS_DENIED"]);
     expect(config.getSimulatorUrl()).toStrictEqual(TEST_SIMULATOR_URL);
   });
 
@@ -109,6 +109,7 @@ describe("Integration: Config POST", () => {
     expect(response.status).toEqual(200);
 
     const config = Config.getInstance();
+    const userConfig = Config.getUserConfiguration(TEST_SUB);
 
     expect(config.getClientId()).toEqual("HGIOgho9HIRhgoepdIOPFdIUWgewi0jw");
     expect(config.getPublicKey()).toEqual(TEST_PUBLIC_KEY);
@@ -123,21 +124,23 @@ describe("Integration: Config POST", () => {
       TEST_ID_TOKEN_SIGNING_ALGORITHM
     );
     expect(config.getClientLoCs()).toEqual(TEST_CLIENT_LOCS);
-    expect(config.getSub()).toEqual(TEST_SUB);
-    expect(config.getEmail()).toEqual("test@example.com");
-    expect(config.getEmailVerified()).toEqual(TEST_EMAIL_VERIFIED);
-    expect(config.getPhoneNumber()).toEqual(TEST_PHONE_NUMBER);
-    expect(config.getPhoneNumberVerified()).toEqual(true);
-    expect(config.getIdTokenErrors()).toStrictEqual([]);
-    expect(config.getCoreIdentityErrors()).toStrictEqual([]);
-    expect(config.getAuthoriseErrors()).toStrictEqual([]);
+    expect(config.getEmail(userConfig)).toEqual("test@example.com");
+    expect(config.getEmailVerified(userConfig)).toEqual(TEST_EMAIL_VERIFIED);
+    expect(config.getPhoneNumber(userConfig)).toEqual(TEST_PHONE_NUMBER);
+    expect(config.getPhoneNumberVerified(userConfig)).toEqual(true);
+    expect(config.getIdTokenErrors(userConfig)).toStrictEqual([]);
+    expect(config.getCoreIdentityErrors(userConfig)).toStrictEqual([]);
+    expect(config.getAuthoriseErrors(userConfig)).toStrictEqual([]);
     expect(config.getSimulatorUrl()).toStrictEqual("http://localhost:3000");
   });
 
   test("If no error configuration is sent, the configured errors are removed", async () => {
     const config = Config.getInstance();
-    config.setCoreIdentityErrors(["INCORRECT_SUB", "INVALID_ALG_HEADER"]);
-    config.setIdTokenErrors(["INCORRECT_VOT", "INVALID_ALG_HEADER"]);
+    const userConfig = Config.getUserConfiguration(TEST_SUB);
+
+    config.setCoreIdentityErrors(userConfig, ["INCORRECT_SUB", "INVALID_ALG_HEADER"]);
+    config.setIdTokenErrors(userConfig, ["INCORRECT_VOT", "INVALID_ALG_HEADER"]);
+    
     const app = createApp();
     const response = await request(app)
       .post("/config")
@@ -167,14 +170,13 @@ describe("Integration: Config POST", () => {
       TEST_ID_TOKEN_SIGNING_ALGORITHM
     );
     expect(config.getClientLoCs()).toEqual(TEST_CLIENT_LOCS);
-    expect(config.getSub()).toEqual(TEST_SUB);
-    expect(config.getEmail()).toEqual("test@example.com");
-    expect(config.getEmailVerified()).toEqual(TEST_EMAIL_VERIFIED);
-    expect(config.getPhoneNumber()).toEqual(TEST_PHONE_NUMBER);
-    expect(config.getPhoneNumberVerified()).toEqual(true);
-    expect(config.getIdTokenErrors()).toStrictEqual([]);
-    expect(config.getCoreIdentityErrors()).toStrictEqual([]);
-    expect(config.getAuthoriseErrors()).toStrictEqual([]);
+    expect(config.getEmail(userConfig)).toEqual("test@example.com");
+    expect(config.getEmailVerified(userConfig)).toEqual(TEST_EMAIL_VERIFIED);
+    expect(config.getPhoneNumber(userConfig)).toEqual(TEST_PHONE_NUMBER);
+    expect(config.getPhoneNumberVerified(userConfig)).toEqual(true);
+    expect(config.getIdTokenErrors(userConfig)).toStrictEqual([]);
+    expect(config.getCoreIdentityErrors(userConfig)).toStrictEqual([]);
+    expect(config.getAuthoriseErrors(userConfig)).toStrictEqual([]);
   });
 
   test("it ignores invalid errors", async () => {
@@ -203,6 +205,7 @@ describe("Integration: Config POST", () => {
     expect(response.status).toEqual(200);
 
     const config = Config.getInstance();
+    const userConfig = Config.getUserConfiguration(TEST_SUB);
 
     expect(config.getClientId()).toEqual("HGIOgho9HIRhgoepdIOPFdIUWgewi0jw");
     expect(config.getPublicKey()).toEqual(TEST_PUBLIC_KEY);
@@ -214,13 +217,12 @@ describe("Integration: Config POST", () => {
       TEST_ID_TOKEN_SIGNING_ALGORITHM
     );
     expect(config.getClientLoCs()).toEqual(TEST_CLIENT_LOCS);
-    expect(config.getSub()).toEqual(TEST_SUB);
-    expect(config.getEmail()).toEqual("test@example.com");
-    expect(config.getEmailVerified()).toEqual(TEST_EMAIL_VERIFIED);
-    expect(config.getPhoneNumber()).toEqual(TEST_PHONE_NUMBER);
-    expect(config.getPhoneNumberVerified()).toEqual(true);
-    expect(config.getIdTokenErrors()).toStrictEqual([]);
-    expect(config.getCoreIdentityErrors()).toStrictEqual([]);
-    expect(config.getAuthoriseErrors()).toStrictEqual([]);
+    expect(config.getEmail(userConfig)).toEqual("test@example.com");
+    expect(config.getEmailVerified(userConfig)).toEqual(TEST_EMAIL_VERIFIED);
+    expect(config.getPhoneNumber(userConfig)).toEqual(TEST_PHONE_NUMBER);
+    expect(config.getPhoneNumberVerified(userConfig)).toEqual(true);
+    expect(config.getIdTokenErrors(userConfig)).toStrictEqual([]);
+    expect(config.getCoreIdentityErrors(userConfig)).toStrictEqual([]);
+    expect(config.getAuthoriseErrors(userConfig)).toStrictEqual([]);
   });
 });

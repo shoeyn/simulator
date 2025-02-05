@@ -1,0 +1,13 @@
+script.
+    document.body.className += ' js-enabled' + ('noModule' in HTMLScriptElement.prototype ? ' govuk-frontend-supported' : '');
+
+a.govuk-skip-link("data-module"="govuk-skip-link", href="#main-content")
+    | Skip to main content
+
+
+include heading.pug
+
+main#main-content.govuk-main-wrapper.app-width-container(role="main")
+    .govuk-width-container
+        block content
+

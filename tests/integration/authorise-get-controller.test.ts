@@ -1140,7 +1140,9 @@ describe("Auth requests using request objects", () => {
     });
 
     it("returns a 302 with access denied if error configuration includes ACCESS_DENIED", async () => {
-      Config.getInstance().setAuthoriseErrors(["ACCESS_DENIED"]);
+      const config = Config.getInstance();
+      const userConfig = Config.getUserConfiguration("testSub");
+      config.setAuthoriseErrors(userConfig, ["ACCESS_DENIED"]);
 
       const app = createApp();
       const requestParams = createRequestParams({
@@ -1149,6 +1151,7 @@ describe("Auth requests using request objects", () => {
         response_type: "code",
         scope: "openid email",
         request: await encodedJwtWithParams({}),
+        sub: "testSub"
       });
       const response = await request(app).get(
         authoriseEndpoint + "?" + requestParams

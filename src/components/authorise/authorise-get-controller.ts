@@ -15,6 +15,7 @@ import { validateAuthRequestObject } from "../../validators/validate-auth-reques
 import { transformRequestObject } from "../../utils/utils";
 import { TrustChainValidationError } from "../../errors/trust-chain-validation-error";
 
+// file deepcode ignore NoRateLimitingForExpensiveWebOperation: required
 export const authoriseController = async (
   req: Request,
   res: Response
@@ -62,7 +63,14 @@ export const authoriseController = async (
       });
     }
 
-    if (config.getAuthoriseErrors().includes("ACCESS_DENIED")) {
+    if (!req.query.sub) {
+      res.render("get-sub");
+      return;
+    }
+
+    const userConfig = Config.getUserConfiguration(req.query.sub as string);
+
+    if (config.getAuthoriseErrors(userConfig).includes("ACCESS_DENIED")) {
       logger.warn("Client configured to return access_denied error response");
       throw new AuthoriseRequestError({
         errorCode: "access_denied",
@@ -76,11 +84,14 @@ export const authoriseController = async (
 
     const authCode = generateAuthCode();
     config.addToAuthCodeRequestParamsStore(authCode, {
-      claims: parsedAuthRequest.claims,
-      nonce: parsedAuthRequest.nonce,
-      redirectUri: parsedAuthRequest.redirect_uri,
-      scopes: parsedAuthRequest.scope,
-      vtr: (parsedAuthRequest.vtr as VectorOfTrust[])[0],
+      sub: req.query.sub as string,
+      params: {
+        claims: parsedAuthRequest.claims,
+        nonce: parsedAuthRequest.nonce,
+        redirectUri: parsedAuthRequest.redirect_uri,
+        scopes: parsedAuthRequest.scope,
+        vtr: (parsedAuthRequest.vtr as VectorOfTrust[])[0],
+      }
     });
 
     res.redirect(

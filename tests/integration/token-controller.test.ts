@@ -41,24 +41,30 @@ const scopes = ["openid"];
 const audience = "http://localhost:3000/token";
 
 const validAuthRequestParams: AuthRequestParameters = {
-  nonce,
-  redirectUri: redirectUri,
-  scopes,
-  claims: VALID_CLAIMS,
-  vtr: {
-    credentialTrust: "Cl.Cm",
-    levelOfConfidence: "P2",
-  },
+  sub: knownSub,
+  params: {
+    nonce,
+    redirectUri: redirectUri,
+    scopes,
+    claims: VALID_CLAIMS,
+    vtr: {
+      credentialTrust: "Cl.Cm",
+      levelOfConfidence: "P2",
+    },
+  }
 };
 const redirectUriMismatchParams: AuthRequestParameters = {
-  nonce,
-  redirectUri: "https://example.com/authentication-callback-invalid/",
-  scopes,
-  claims: [],
-  vtr: {
-    credentialTrust: "Cl.Cm",
-    levelOfConfidence: null,
-  },
+  sub: knownSub,
+  params: {
+    nonce,
+    redirectUri: "https://example.com/authentication-callback-invalid/",
+    scopes,
+    claims: [],
+    vtr: {
+      credentialTrust: "Cl.Cm",
+      levelOfConfidence: null,
+    },
+  }
 };
 
 const createValidClientAssertion = async (
@@ -528,7 +534,7 @@ describe("/token endpoint, configured error responses", () => {
     const response = await request(app).post(TOKEN_ENDPOINT).send(validRequest);
     const { id_token } = response.body;
     const { payload } = decodeJwtNoVerify(id_token);
-    expect(payload.vot).not.toEqual(validAuthRequestParams.vtr.credentialTrust);
+    expect(payload.vot).not.toEqual(validAuthRequestParams.params.vtr.credentialTrust);
     expect(payload.vot).toBe("Cl");
   });
 
@@ -595,7 +601,7 @@ describe("/token endpoint, configured error responses", () => {
     const response = await request(app).post(TOKEN_ENDPOINT).send(validRequest);
     const { id_token } = response.body;
     const { payload } = decodeJwtNoVerify(id_token);
-    expect(payload.nonce).not.toBe(validAuthRequestParams.nonce);
+    expect(payload.nonce).not.toBe(validAuthRequestParams.params.nonce);
   });
 });
 
@@ -710,7 +716,7 @@ describe("/token endpoint valid client_assertion", () => {
     expect(decodedAccessToken.payload.client_id).toBe(knownClientId);
     expect(decodedAccessToken.payload.sid).toBe(SESSION_ID);
     expect(decodedAccessToken.payload.scope).toStrictEqual(
-      validAuthRequestParams.scopes
+      validAuthRequestParams.params.scopes
     );
     expect(decodedAccessToken.payload.claims).toEqual(VALID_CLAIMS);
     expect(decodedIdToken.protectedHeader).toStrictEqual({
@@ -722,9 +728,9 @@ describe("/token endpoint valid client_assertion", () => {
     expect(decodedIdToken.payload.vtm).toBe("http://localhost:3000/trustmark");
     expect(decodedIdToken.payload.aud).toBe(knownClientId);
     expect(decodedIdToken.payload.sid).toBe(SESSION_ID);
-    expect(decodedIdToken.payload.nonce).toBe(validAuthRequestParams.nonce);
+    expect(decodedIdToken.payload.nonce).toBe(validAuthRequestParams.params.nonce);
     expect(decodedIdToken.payload.vot).toBe(
-      validAuthRequestParams.vtr.credentialTrust
+      validAuthRequestParams.params.vtr.credentialTrust
     );
     expect(decodedIdToken.payload.iat).toBe(Math.floor(TIME_NOW / 1000));
     expect(decodedIdToken.payload.exp).toBe(

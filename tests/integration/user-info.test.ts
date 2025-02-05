@@ -800,6 +800,7 @@ async function createAccessToken(
   claims?: UserIdentityClaim[] | null
 ): Promise<string> {
   let signedJwtBuilder = new SignJWT({
+    sub: KNOWN_SUB_CLAIM,
     client_id: clientId,
     scope: scopes,
     claims: claims,

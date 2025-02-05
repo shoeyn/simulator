@@ -20,7 +20,6 @@ describe("createAccessToken tests", () => {
     "urn:fdc:gov.uk:2022:56P4CMsGh_02YOlWpd8PAOI-2sVlB2nsNU7mcLZYhYw=";
 
   const clientIdSpy = jest.spyOn(Config.getInstance(), "getClientId");
-  const subSpy = jest.spyOn(Config.getInstance(), "getSub");
   const tokenSigningAlgorithmSpy = jest.spyOn(
     Config.getInstance(),
     "getIdTokenSigningAlgorithm"
@@ -58,10 +57,10 @@ describe("createAccessToken tests", () => {
         levelOfConfidence: "P2",
       };
       tokenSigningAlgorithmSpy.mockReturnValue(tokenSigningAlgorithm);
-      subSpy.mockReturnValue(testSubClaim);
       clientIdSpy.mockReturnValue(testClientId);
 
       const accessToken = await createAccessToken(
+        testSubClaim,
         ["openid"],
         vtr,
         VALID_CLAIMS
@@ -96,7 +95,7 @@ describe("createAccessToken tests", () => {
       credentialTrust: "Cl.Cm",
       levelOfConfidence: "P2",
     };
-    const accessToken = await createAccessToken(["openid"], vtr, null);
+    const accessToken = await createAccessToken(testSubClaim, ["openid"], vtr, null);
     const tokenParts = accessToken.split(".");
 
     const payload = decodeTokenPart(tokenParts[1]);
@@ -109,7 +108,7 @@ describe("createAccessToken tests", () => {
       credentialTrust: "Cl",
       levelOfConfidence: null,
     };
-    const accessToken = await createAccessToken(["openid"], vtr, VALID_CLAIMS);
+    const accessToken = await createAccessToken(testSubClaim, ["openid"], vtr, VALID_CLAIMS);
     const tokenParts = accessToken.split(".");
 
     const payload = decodeTokenPart(tokenParts[1]);

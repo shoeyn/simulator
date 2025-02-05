@@ -11,8 +11,7 @@ test("returns 200 response with current configuration", async () => {
   const config = Config.getInstance();
   const expectedBody = {
     clientConfiguration: config.getClientConfiguration(),
-    responseConfiguration: config.getResponseConfiguration(),
-    errorConfiguration: config.getErrorConfiguration(),
+    userConfigurations: config.getUserConfigurations(),
     simulatorUrl: config.getSimulatorUrl(),
   };
   expect(response.body).toEqual(expectedBody);

@@ -11,6 +11,7 @@ import { AccessTokenClaims } from "../../../types/access-token-claims";
 import { VectorOfTrust } from "../../../types/vector-of-trust";
 
 export const createAccessToken = async (
+  sub: string,
   scope: string[],
   vtr: VectorOfTrust,
   claims?: string[] | null
@@ -18,6 +19,7 @@ export const createAccessToken = async (
   logger.info("Creating access token");
   const config = Config.getInstance();
   const accessTokenClaims = createAccessTokenClaimSet(
+    sub,
     scope,
     config,
     getClaimsRequest(vtr, claims)
@@ -42,6 +44,7 @@ export const getClaimsRequest = (
 };
 
 const createAccessTokenClaimSet = (
+  sub: string,
   scope: string[],
   config: Config,
   claims?: string[] | null
@@ -50,7 +53,6 @@ const createAccessTokenClaimSet = (
   const exp = iat + ACCESS_TOKEN_EXPIRY;
   const jti = randomUUID();
   const sid = SESSION_ID;
-  const sub = config.getSub();
   const clientId = config.getClientId();
 
   return {

@@ -33,11 +33,11 @@ export const tokenController = async (
     }
 
     if (
-      authCodeParams.redirectUri !== parsedTokenRequest.tokenRequest.redirectUri
+      authCodeParams.params.redirectUri !== parsedTokenRequest.tokenRequest.redirectUri
     ) {
       logger.warn(
         {
-          authCodeRedirect: authCodeParams.redirectUri,
+          authCodeRedirect: authCodeParams.params.redirectUri,
           tokenRequestRedirect: parsedTokenRequest.tokenRequest.redirectUri,
         },
         "Mismatch in redirect uri between auth code params and token request"
@@ -50,14 +50,15 @@ export const tokenController = async (
     }
 
     const accessToken = await createAccessToken(
-      authCodeParams.scopes,
-      authCodeParams.vtr,
-      authCodeParams.claims
+      authCodeParams.sub,
+      authCodeParams.params.scopes,
+      authCodeParams.params.vtr,
+      authCodeParams.params.claims
     );
     const idToken = await createIdToken(authCodeParams, accessToken);
 
     config.addToAccessTokenStore(
-      `${config.getClientId()}.${config.getSub()}`,
+      `${config.getClientId()}.${authCodeParams.sub}`,
       accessToken
     );
 

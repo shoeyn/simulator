@@ -19,6 +19,7 @@ export const createIdToken = async (
 ): Promise<string> => {
   logger.info("Creating Id token");
   const config = Config.getInstance();
+  const userConfig = Config.getUserConfiguration(authRequestParams.sub);
 
   const idTokenClaims = createIdTokenClaimSet(
     config,
@@ -26,7 +27,7 @@ export const createIdToken = async (
     accessToken
   );
 
-  const idTokenErrors = config.getIdTokenErrors();
+  const idTokenErrors = config.getIdTokenErrors(userConfig);
 
   let signedIdToken = await signToken(idTokenClaims);
 
@@ -47,7 +48,8 @@ const createIdTokenClaimSet = (
   authRequestParams: AuthRequestParameters,
   accessToken: string
 ): IdTokenClaims => {
-  const idTokenErrors = config.getIdTokenErrors();
+  const userConfig = Config.getUserConfiguration(authRequestParams.sub);
+  const idTokenErrors = config.getIdTokenErrors(userConfig);
   const timeNow = Math.floor(Date.now() / 1000);
   const iat = idTokenErrors.includes("TOKEN_NOT_VALID_YET")
     ? timeNow + ONE_DAY_IN_SECONDS
@@ -57,14 +59,14 @@ const createIdTokenClaimSet = (
     : timeNow + ID_TOKEN_EXPIRY;
 
   const vot = idTokenErrors.includes("INCORRECT_VOT")
-    ? getOtherCredentialTrust(authRequestParams.vtr.credentialTrust)
-    : authRequestParams.vtr.credentialTrust;
+    ? getOtherCredentialTrust(authRequestParams.params.vtr.credentialTrust)
+    : authRequestParams.params.vtr.credentialTrust;
 
   return {
     iat,
     exp,
     at_hash: generateAccessTokenHash(accessToken),
-    sub: config.getSub(),
+    sub: authRequestParams.sub,
     aud: idTokenErrors.includes("INVALID_AUD")
       ? randomBytes(32).toString()
       : config.getClientId(),
@@ -75,7 +77,7 @@ const createIdTokenClaimSet = (
     vot,
     nonce: idTokenErrors.includes("NONCE_NOT_MATCHING")
       ? randomBytes(32).toString()
-      : authRequestParams.nonce,
+      : authRequestParams.params.nonce,
     vtm: config.getTrustmarkUrl(),
     auth_time: timeNow,
   };

@@ -1,0 +1,14 @@
+extends layouts/layout
+
+block content
+    <form class="govuk-form-group" method="GET">
+        <h1 class="govuk-label-wrapper">
+            <label class="govuk-label govuk-label--l" for="event-name">
+                What user sub are you logging in as?
+            </label>
+        </h1>
+        <input class="govuk-input" id="user-sub" name="sub" type="text">
+        <button type="submit" class="govuk-button" data-module="govuk-button">
+            Save and continue
+        </button>
+    </form>

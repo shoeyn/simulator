@@ -9,7 +9,7 @@ import { UserIdentityClaim, UserScope } from "../types/user-info";
 export const userInfoRequestValidator = async (
   userInfoRequestHeaders: IncomingHttpHeaders
 ): Promise<
-  | { valid: true; claims: UserIdentityClaim[]; scopes: UserScope[] }
+  | { valid: true; sub: string; claims: UserIdentityClaim[]; scopes: UserScope[] }
   | {
       valid: false;
       error: UserInfoRequestError;
@@ -41,7 +41,7 @@ export const userInfoRequestValidator = async (
   const config_identity_supported = config.getIdentityVerificationSupported();
   const config_claims = config.getClaims();
 
-  const { client_id, scope, claims } = jwtResult.payload;
+  const { client_id, scope, claims, sub } = jwtResult.payload;
 
   if (!client_id || client_id != config_client_id) {
     logger.warn(
@@ -63,7 +63,7 @@ export const userInfoRequestValidator = async (
   }
 
   const accessTokensForClient = config.getAccessTokensFromStore(
-    `${config_client_id}.${config.getSub()}`
+    `${config_client_id}.${sub}`
   );
 
   if (!accessTokensForClient?.includes(accessToken)) {
@@ -73,12 +73,12 @@ export const userInfoRequestValidator = async (
 
   if (!config_identity_supported) {
     logger.info("Identity not supported - ignoring claims.");
-    return { valid: true, claims: [], scopes: scope as UserScope[] };
+    return { valid: true, sub: sub ?? "", claims: [], scopes: scope as UserScope[] };
   }
 
   if (claims == null || (Array.isArray(claims) && claims.length == 0)) {
     logger.info("No identity claims in access token.");
-    return { valid: true, claims: [], scopes: scope as UserScope[] };
+    return { valid: true, sub: sub ?? "", claims: [], scopes: scope as UserScope[] };
   }
 
   logger.info("Identity claims present in access token.");
@@ -95,6 +95,7 @@ export const userInfoRequestValidator = async (
   }
 
   return {
+    sub: sub ?? "",
     valid: true,
     claims: claims as UserIdentityClaim[],
     scopes: scope as UserScope[],

@@ -1,6 +1,6 @@
 import ConfigRequest from "../../types/config-request";
 import { Request, Response } from "express";
-import { Config } from "../../config";
+import { Config, UserConfiguration } from "../../config";
 import ClientConfiguration from "../../types/client-configuration";
 import ResponseConfiguration from "../../types/response-configuration";
 import { ErrorConfiguration } from "../../types/error-configuration";
@@ -22,14 +22,14 @@ export const configController = (
   if (req.body.clientConfiguration !== undefined) {
     populateClientConfiguration(req.body.clientConfiguration);
   }
-  if (req.body.responseConfiguration !== undefined) {
-    populateResponseConfiguration(req.body.responseConfiguration);
+  if (req.body.responseConfiguration !== undefined && req.body.responseConfiguration.sub !== undefined) {
+    const userConfig = Config.getUserConfiguration(req.body.responseConfiguration.sub);
+    populateResponseConfiguration(userConfig, req.body.responseConfiguration);
+    populateErrorConfiguration(userConfig, req.body.errorConfiguration);
   }
   if (req.body.simulatorUrl !== undefined) {
     Config.getInstance().setSimulatorUrl(req.body.simulatorUrl);
   }
-
-  populateErrorConfiguration(req.body.errorConfiguration);
 
   res.status(200).send();
 };
@@ -75,60 +75,61 @@ const populateClientConfiguration = (
 };
 
 const populateResponseConfiguration = (
+  userConfig: UserConfiguration,
   responseConfiguration: ResponseConfiguration
 ) => {
   const config = Config.getInstance();
-  if (responseConfiguration.sub !== undefined) {
-    config.setSub(responseConfiguration.sub);
-  }
   if (responseConfiguration.email !== undefined) {
-    config.setEmail(responseConfiguration.email);
+    config.setEmail(userConfig, responseConfiguration.email);
   }
   if (responseConfiguration.emailVerified !== undefined) {
-    config.setEmailVerified(responseConfiguration.emailVerified);
+    config.setEmailVerified(userConfig, responseConfiguration.emailVerified);
   }
   if (responseConfiguration.phoneNumber !== undefined) {
-    config.setPhoneNumber(responseConfiguration.phoneNumber);
+    config.setPhoneNumber(userConfig, responseConfiguration.phoneNumber);
   }
   if (responseConfiguration.phoneNumberVerified !== undefined) {
-    config.setPhoneNumberVerified(responseConfiguration.phoneNumberVerified);
+    config.setPhoneNumberVerified(userConfig, responseConfiguration.phoneNumberVerified);
   }
   if (responseConfiguration.maxLoCAchieved !== undefined) {
-    config.setMaxLoCAchieved(responseConfiguration.maxLoCAchieved);
+    config.setMaxLoCAchieved(userConfig, responseConfiguration.maxLoCAchieved);
   }
   if (responseConfiguration.coreIdentityVerifiableCredentials !== undefined) {
     config.setVerifiableIdentityCredentials(
+      userConfig,
       responseConfiguration.coreIdentityVerifiableCredentials
     );
   }
   if (responseConfiguration.passportDetails !== undefined) {
-    config.setPassportDetails(responseConfiguration.passportDetails);
+    config.setPassportDetails(userConfig, responseConfiguration.passportDetails);
   }
   if (responseConfiguration.drivingPermitDetails !== undefined) {
-    config.setDrivingPermitDetails(responseConfiguration.drivingPermitDetails);
+    config.setDrivingPermitDetails(userConfig, responseConfiguration.drivingPermitDetails);
   }
   if (responseConfiguration.socialSecurityRecordDetails !== undefined) {
     config.setSocialSecurityRecordDetails(
+      userConfig,
       responseConfiguration.socialSecurityRecordDetails
     );
   }
   if (responseConfiguration.postalAddressDetails !== undefined) {
-    config.setPostalAddressDetails(responseConfiguration.postalAddressDetails);
+    config.setPostalAddressDetails(userConfig, responseConfiguration.postalAddressDetails);
   }
   if (responseConfiguration.returnCodes !== undefined) {
-    config.setReturnCodes(responseConfiguration.returnCodes);
+    config.setReturnCodes(userConfig, responseConfiguration.returnCodes);
   }
 };
 
 const populateErrorConfiguration = (
+  userConfig: UserConfiguration,
   errorConfiguration: Partial<ErrorConfiguration> | undefined
 ): void => {
   const config = Config.getInstance();
 
   if (!errorConfiguration) {
-    config.setCoreIdentityErrors([]);
-    config.setIdTokenErrors([]);
-    config.setAuthoriseErrors([]);
+    config.setCoreIdentityErrors(userConfig, []);
+    config.setIdTokenErrors(userConfig, []);
+    config.setAuthoriseErrors(userConfig, []);
     return;
   }
 
@@ -141,7 +142,7 @@ const populateErrorConfiguration = (
   const authoriseErrors =
     errorConfiguration.authoriseErrors?.filter(isAuthoriseError) ?? [];
 
-  config.setCoreIdentityErrors(coreIdentityErrors);
-  config.setIdTokenErrors(idTokenErrors);
-  config.setAuthoriseErrors(authoriseErrors);
+  config.setCoreIdentityErrors(userConfig, coreIdentityErrors);
+  config.setIdTokenErrors(userConfig, idTokenErrors);
+  config.setAuthoriseErrors(userConfig, authoriseErrors);
 };

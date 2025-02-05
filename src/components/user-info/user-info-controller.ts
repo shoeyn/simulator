@@ -5,7 +5,7 @@ import {
   UserInfo,
 } from "../../types/user-info";
 import { userInfoRequestValidator } from "../../validators/user-info-request-validator";
-import { Config } from "../../config";
+import { Config, UserConfiguration } from "../../config";
 import { UserInfoRequestError } from "../../errors/user-info-request-error";
 import { importPKCS8, JWTPayload, SignJWT } from "jose";
 import {
@@ -41,19 +41,20 @@ export const userInfoController = async (
   logger.info("Successfully validated access token.");
 
   const config = Config.getInstance();
+  const userConfig = Config.getUserConfiguration(validationResult.sub);
 
   const userInfo: UserInfo = {
-    sub: config.getSub(),
+    sub: validationResult.sub,
   };
 
   if (validationResult.scopes.includes("email")) {
-    userInfo.email = config.getEmail();
-    userInfo.email_verified = config.getEmailVerified();
+    userInfo.email = config.getEmail(userConfig);
+    userInfo.email_verified = config.getEmailVerified(userConfig);
   }
 
   if (validationResult.scopes.includes("phone")) {
-    userInfo.phone_number = config.getPhoneNumber() || undefined;
-    userInfo.phone_number_verified = config.getPhoneNumberVerified();
+    userInfo.phone_number = config.getPhoneNumber(userConfig) || undefined;
+    userInfo.phone_number_verified = config.getPhoneNumberVerified(userConfig);
   }
 
   const claims = validationResult.claims;
@@ -61,33 +62,33 @@ export const userInfoController = async (
     userInfo,
     claims,
     "https://vocab.account.gov.uk/v1/drivingPermit",
-    config.getDrivingPermitDetails()
+    config.getDrivingPermitDetails(userConfig)
   );
   tryAddClaim(
     userInfo,
     claims,
     "https://vocab.account.gov.uk/v1/passport",
-    config.getPassportDetails()
+    config.getPassportDetails(userConfig)
   );
   tryAddClaim(
     userInfo,
     claims,
     "https://vocab.account.gov.uk/v1/socialSecurityRecord",
-    config.getSocialSecurityRecordDetails()
+    config.getSocialSecurityRecordDetails(userConfig)
   );
   tryAddClaim(
     userInfo,
     claims,
     "https://vocab.account.gov.uk/v1/address",
-    config.getPostalAddressDetails()
+    config.getPostalAddressDetails(userConfig)
   );
   tryAddClaim(
     userInfo,
     claims,
     "https://vocab.account.gov.uk/v1/returnCode",
-    config.getReturnCodes()
+    config.getReturnCodes(userConfig)
   );
-  await tryAddCoreIdentityJwt(userInfo, claims, config);
+  await tryAddCoreIdentityJwt(userInfo, claims, config, userConfig);
 
   res.status(200);
   res.send(userInfo);
@@ -114,12 +115,13 @@ const tryAddClaim = (
 const tryAddCoreIdentityJwt = async (
   userInfo: UserInfo,
   requestedClaims: UserIdentityClaim[],
-  config: Config
+  config: Config,
+  userConfig: UserConfiguration
 ): Promise<void> => {
   const claim: UserIdentityClaim =
     "https://vocab.account.gov.uk/v1/coreIdentityJWT";
-  const vc = config.getVerifiableIdentityCredentials();
-  const coreIdentityErrors = config.getCoreIdentityErrors();
+  const vc = config.getVerifiableIdentityCredentials(userConfig);
+  const coreIdentityErrors = config.getCoreIdentityErrors(userConfig);
 
   if (requestedClaims.includes(claim)) {
     if (!vc) {
@@ -132,7 +134,7 @@ const tryAddCoreIdentityJwt = async (
     const timeNowSeconds = Math.floor(Date.now() / 1000);
     const oneDayTimeOffsetSeconds = 24 * 60 * 60;
     const coreIdentity = {
-      vot: config.getMaxLoCAchieved(),
+      vot: config.getMaxLoCAchieved(userConfig),
       vc: vc,
       vtm: config.getTrustmarkUrl(),
       iss: coreIdentityErrors.includes("INVALID_ISS")
@@ -140,7 +142,7 @@ const tryAddCoreIdentityJwt = async (
         : config.getIssuerValue(),
       sub: coreIdentityErrors.includes("INCORRECT_SUB")
         ? randomBytes(32).toString()
-        : config.getSub(),
+        : userConfig.response.sub,
       nbf: timeNowSeconds,
       exp: coreIdentityErrors.includes("TOKEN_EXPIRED")
         ? timeNowSeconds - oneDayTimeOffsetSeconds
