@@ -259,9 +259,7 @@ CQIDAQAB
     this.clientConfiguration.clientLoCs = clientLoCs;
   }
 
-  public getResponseConfiguration(
-    userIndex: number
-  ): ResponseConfiguration {
+  public getResponseConfiguration(userIndex: number): ResponseConfiguration {
     return this.userConfigurations[userIndex].response;
   }
 
@@ -281,10 +279,7 @@ CQIDAQAB
     return this.userConfigurations[userIndex].response.emailVerified!;
   }
 
-  public setEmailVerified(
-    userIndex: number,
-    emailVerified: boolean
-  ): void {
+  public setEmailVerified(userIndex: number, emailVerified: boolean): void {
     this.userConfigurations[userIndex].response.emailVerified = emailVerified;
   }
 
@@ -292,10 +287,7 @@ CQIDAQAB
     return this.userConfigurations[userIndex].response.phoneNumber!;
   }
 
-  public setPhoneNumber(
-    userIndex: number,
-    phoneNumber: string
-  ): void {
+  public setPhoneNumber(userIndex: number, phoneNumber: string): void {
     this.userConfigurations[userIndex].response.phoneNumber = phoneNumber;
   }
 
@@ -307,31 +299,30 @@ CQIDAQAB
     userIndex: number,
     phoneNumberVerified: boolean
   ): void {
-    this.userConfigurations[userIndex].response.phoneNumberVerified = phoneNumberVerified;
+    this.userConfigurations[userIndex].response.phoneNumberVerified =
+      phoneNumberVerified;
   }
 
   public getMaxLoCAchieved(userIndex: number): string {
     return this.userConfigurations[userIndex].response.maxLoCAchieved!;
   }
 
-  public setMaxLoCAchieved(
-    userIndex: number,
-    maxLoCAchieved: string
-  ): void {
+  public setMaxLoCAchieved(userIndex: number, maxLoCAchieved: string): void {
     this.userConfigurations[userIndex].response.maxLoCAchieved = maxLoCAchieved;
   }
 
-  public getVerifiableIdentityCredentials(
-    userIndex: number
-  ): object | null {
-    return this.userConfigurations[userIndex].response.coreIdentityVerifiableCredentials!;
+  public getVerifiableIdentityCredentials(userIndex: number): object | null {
+    return this.userConfigurations[userIndex].response
+      .coreIdentityVerifiableCredentials!;
   }
 
   public setVerifiableIdentityCredentials(
     userIndex: number,
     coreIdentityVerifiableCredentials: object | null
   ): void {
-    this.userConfigurations[userIndex].response.coreIdentityVerifiableCredentials =
+    this.userConfigurations[
+      userIndex
+    ].response.coreIdentityVerifiableCredentials =
       coreIdentityVerifiableCredentials;
   }
 
@@ -343,12 +334,11 @@ CQIDAQAB
     userIndex: number,
     passportDetails: object[] | null
   ): void {
-    this.userConfigurations[userIndex].response.passportDetails = passportDetails;
+    this.userConfigurations[userIndex].response.passportDetails =
+      passportDetails;
   }
 
-  public getDrivingPermitDetails(
-    userIndex: number
-  ): object[] | null {
+  public getDrivingPermitDetails(userIndex: number): object[] | null {
     return this.userConfigurations[userIndex].response.drivingPermitDetails!;
   }
 
@@ -356,12 +346,11 @@ CQIDAQAB
     userIndex: number,
     drivingPermitDetails: object[] | null
   ): void {
-    this.userConfigurations[userIndex].response.drivingPermitDetails = drivingPermitDetails;
+    this.userConfigurations[userIndex].response.drivingPermitDetails =
+      drivingPermitDetails;
   }
 
-  public getPostalAddressDetails(
-    userIndex: number
-  ): object[] | null {
+  public getPostalAddressDetails(userIndex: number): object[] | null {
     return this.userConfigurations[userIndex].response.postalAddressDetails!;
   }
 
@@ -369,7 +358,8 @@ CQIDAQAB
     userIndex: number,
     postalAddressDetails: object[] | null
   ): void {
-    this.userConfigurations[userIndex].response.postalAddressDetails = postalAddressDetails;
+    this.userConfigurations[userIndex].response.postalAddressDetails =
+      postalAddressDetails;
   }
 
   public getReturnCodes(userIndex: number): ReturnCode[] | null {
@@ -416,15 +406,11 @@ CQIDAQAB
     ];
   }
 
-  public getErrorConfiguration(
-    userIndex: number
-  ): ErrorConfiguration {
+  public getErrorConfiguration(userIndex: number): ErrorConfiguration {
     return this.userConfigurations[userIndex].error;
   }
 
-  public getCoreIdentityErrors(
-    userIndex: number
-  ): CoreIdentityError[] {
+  public getCoreIdentityErrors(userIndex: number): CoreIdentityError[] {
     return this.userConfigurations[userIndex].error.coreIdentityErrors!;
   }
 
@@ -432,7 +418,8 @@ CQIDAQAB
     userIndex: number,
     coreIdentityErrors: CoreIdentityError[]
   ): void {
-    this.userConfigurations[userIndex].error.coreIdentityErrors = coreIdentityErrors;
+    this.userConfigurations[userIndex].error.coreIdentityErrors =
+      coreIdentityErrors;
   }
 
   public getIdTokenErrors(userIndex: number): IdTokenError[] {

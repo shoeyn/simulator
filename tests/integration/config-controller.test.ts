@@ -146,10 +146,7 @@ describe("Integration: Config POST", () => {
       "INCORRECT_SUB",
       "INVALID_ALG_HEADER",
     ]);
-    config.setIdTokenErrors(userIndex, [
-      "INCORRECT_VOT",
-      "INVALID_ALG_HEADER",
-    ]);
+    config.setIdTokenErrors(userIndex, ["INCORRECT_VOT", "INVALID_ALG_HEADER"]);
 
     const app = createApp();
     const response = await request(app)

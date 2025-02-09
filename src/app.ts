@@ -20,11 +20,24 @@ const createApp = (): Application => {
   app.use(express.json());
   app.use(express.urlencoded({ extended: false }));
   app.use(dedupeQueryParams);
-  app.set('views', path.join(__dirname, 'views'));
-  app.set('view engine', 'pug');
+  app.set("views", path.join(__dirname, "views"));
+  app.set("view engine", "pug");
 
-  app.use('/assets', express.static(path.join(__dirname, '../node_modules/govuk-frontend/dist/govuk/assets')));
-  app.use('/assets/application.css', express.static(path.join(__dirname, '../node_modules/govuk-frontend/dist/govuk/govuk-frontend.min.css')));
+  app.use(
+    "/assets",
+    express.static(
+      path.join(__dirname, "../node_modules/govuk-frontend/dist/govuk/assets")
+    )
+  );
+  app.use(
+    "/assets/application.css",
+    express.static(
+      path.join(
+        __dirname,
+        "../node_modules/govuk-frontend/dist/govuk/govuk-frontend.min.css"
+      )
+    )
+  );
 
   app.get("/", (req: Request, res: Response) => {
     res.render("home");

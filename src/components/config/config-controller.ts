@@ -27,9 +27,7 @@ export const configController = (
     req.body.responseConfiguration !== undefined &&
     req.body.responseConfiguration.sub !== undefined
   ) {
-    const userIndex = config.getUserIndex(
-      req.body.responseConfiguration.sub
-    );
+    const userIndex = config.getUserIndex(req.body.responseConfiguration.sub);
     populateResponseConfiguration(userIndex, req.body.responseConfiguration);
     populateErrorConfiguration(userIndex, req.body.errorConfiguration);
   }
@@ -110,10 +108,7 @@ const populateResponseConfiguration = (
     );
   }
   if (responseConfiguration.passportDetails !== undefined) {
-    config.setPassportDetails(
-      userIndex,
-      responseConfiguration.passportDetails
-    );
+    config.setPassportDetails(userIndex, responseConfiguration.passportDetails);
   }
   if (responseConfiguration.drivingPermitDetails !== undefined) {
     config.setDrivingPermitDetails(
