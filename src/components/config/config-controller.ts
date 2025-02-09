@@ -1,6 +1,6 @@
 import ConfigRequest from "../../types/config-request";
 import { Request, Response } from "express";
-import { Config, UserConfiguration } from "../../config";
+import { Config } from "../../config";
 import ClientConfiguration from "../../types/client-configuration";
 import ResponseConfiguration from "../../types/response-configuration";
 import { ErrorConfiguration } from "../../types/error-configuration";
@@ -13,6 +13,7 @@ export const configController = (
   req: Request<ConfigRequest>,
   res: Response
 ): void => {
+  const config = Config.getInstance();
   const validationFailures = validationResult(req);
   if (!validationFailures.isEmpty()) {
     res.status(400).send({ errors: validationFailures.mapped() });
@@ -26,14 +27,14 @@ export const configController = (
     req.body.responseConfiguration !== undefined &&
     req.body.responseConfiguration.sub !== undefined
   ) {
-    const userConfig = Config.getUserConfiguration(
+    const userIndex = config.getUserIndex(
       req.body.responseConfiguration.sub
     );
-    populateResponseConfiguration(userConfig, req.body.responseConfiguration);
-    populateErrorConfiguration(userConfig, req.body.errorConfiguration);
+    populateResponseConfiguration(userIndex, req.body.responseConfiguration);
+    populateErrorConfiguration(userIndex, req.body.errorConfiguration);
   }
   if (req.body.simulatorUrl !== undefined) {
-    Config.getInstance().setSimulatorUrl(req.body.simulatorUrl);
+    config.setSimulatorUrl(req.body.simulatorUrl);
   }
 
   res.status(200).send();
@@ -80,73 +81,67 @@ const populateClientConfiguration = (
 };
 
 const populateResponseConfiguration = (
-  userConfig: UserConfiguration,
+  userIndex: number,
   responseConfiguration: ResponseConfiguration
 ) => {
   const config = Config.getInstance();
   if (responseConfiguration.email !== undefined) {
-    config.setEmail(userConfig, responseConfiguration.email);
+    config.setEmail(userIndex, responseConfiguration.email);
   }
   if (responseConfiguration.emailVerified !== undefined) {
-    config.setEmailVerified(userConfig, responseConfiguration.emailVerified);
+    config.setEmailVerified(userIndex, responseConfiguration.emailVerified);
   }
   if (responseConfiguration.phoneNumber !== undefined) {
-    config.setPhoneNumber(userConfig, responseConfiguration.phoneNumber);
+    config.setPhoneNumber(userIndex, responseConfiguration.phoneNumber);
   }
   if (responseConfiguration.phoneNumberVerified !== undefined) {
     config.setPhoneNumberVerified(
-      userConfig,
+      userIndex,
       responseConfiguration.phoneNumberVerified
     );
   }
   if (responseConfiguration.maxLoCAchieved !== undefined) {
-    config.setMaxLoCAchieved(userConfig, responseConfiguration.maxLoCAchieved);
+    config.setMaxLoCAchieved(userIndex, responseConfiguration.maxLoCAchieved);
   }
   if (responseConfiguration.coreIdentityVerifiableCredentials !== undefined) {
     config.setVerifiableIdentityCredentials(
-      userConfig,
+      userIndex,
       responseConfiguration.coreIdentityVerifiableCredentials
     );
   }
   if (responseConfiguration.passportDetails !== undefined) {
     config.setPassportDetails(
-      userConfig,
+      userIndex,
       responseConfiguration.passportDetails
     );
   }
   if (responseConfiguration.drivingPermitDetails !== undefined) {
     config.setDrivingPermitDetails(
-      userConfig,
+      userIndex,
       responseConfiguration.drivingPermitDetails
-    );
-  }
-  if (responseConfiguration.socialSecurityRecordDetails !== undefined) {
-    config.setSocialSecurityRecordDetails(
-      userConfig,
-      responseConfiguration.socialSecurityRecordDetails
     );
   }
   if (responseConfiguration.postalAddressDetails !== undefined) {
     config.setPostalAddressDetails(
-      userConfig,
+      userIndex,
       responseConfiguration.postalAddressDetails
     );
   }
   if (responseConfiguration.returnCodes !== undefined) {
-    config.setReturnCodes(userConfig, responseConfiguration.returnCodes);
+    config.setReturnCodes(userIndex, responseConfiguration.returnCodes);
   }
 };
 
 const populateErrorConfiguration = (
-  userConfig: UserConfiguration,
+  userIndex: number,
   errorConfiguration: Partial<ErrorConfiguration> | undefined
 ): void => {
   const config = Config.getInstance();
 
   if (!errorConfiguration) {
-    config.setCoreIdentityErrors(userConfig, []);
-    config.setIdTokenErrors(userConfig, []);
-    config.setAuthoriseErrors(userConfig, []);
+    config.setCoreIdentityErrors(userIndex, []);
+    config.setIdTokenErrors(userIndex, []);
+    config.setAuthoriseErrors(userIndex, []);
     return;
   }
 
@@ -159,7 +154,7 @@ const populateErrorConfiguration = (
   const authoriseErrors =
     errorConfiguration.authoriseErrors?.filter(isAuthoriseError) ?? [];
 
-  config.setCoreIdentityErrors(userConfig, coreIdentityErrors);
-  config.setIdTokenErrors(userConfig, idTokenErrors);
-  config.setAuthoriseErrors(userConfig, authoriseErrors);
+  config.setCoreIdentityErrors(userIndex, coreIdentityErrors);
+  config.setIdTokenErrors(userIndex, idTokenErrors);
+  config.setAuthoriseErrors(userIndex, authoriseErrors);
 };

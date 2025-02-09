@@ -117,7 +117,6 @@ CQIDAQAB
         },
         passportDetails: null,
         drivingPermitDetails: null,
-        socialSecurityRecordDetails: null,
         postalAddressDetails: [
           {
             addressCountry: "GB",
@@ -158,31 +157,26 @@ CQIDAQAB
     Config.instance = new Config();
   }
 
-  public static getUserConfiguration(sub: string): UserConfiguration {
-    const config = Config.getInstance();
-
-    const userConfig = config.userConfigurations.find(
+  public getUserIndex(sub: string): number {
+    const userIndex = this.userConfigurations.findIndex(
       (u) => u.response.sub === sub
     );
-    if (userConfig) {
-      return userConfig;
+    if (userIndex > -1) {
+      return userIndex;
     }
 
     const newConfig = Config.newUserConfig();
     newConfig.response.sub = sub;
-    config.userConfigurations.push(newConfig);
+    this.userConfigurations.push(newConfig);
 
-    return newConfig;
+    return this.userConfigurations.length - 1;
   }
 
-  public static deleteUserConfiguration(sub: string): void {
-    const config = Config.getInstance();
-    const i = config.userConfigurations.findIndex(
-      (u) => u.response.sub === sub
-    );
+  public deleteUserConfiguration(sub: string): void {
+    const i = this.getUserIndex(sub);
 
     if (i > -1) {
-      config.userConfigurations.splice(i);
+      this.userConfigurations.splice(i);
     }
   }
 
@@ -266,141 +260,127 @@ CQIDAQAB
   }
 
   public getResponseConfiguration(
-    userConfig: UserConfiguration
+    userIndex: number
   ): ResponseConfiguration {
-    return userConfig.response;
+    return this.userConfigurations[userIndex].response;
   }
 
   public getUserConfigurations(): UserConfiguration[] {
     return this.userConfigurations;
   }
 
-  public getEmail(userConfig: UserConfiguration): string {
-    return userConfig.response.email!;
+  public getEmail(userIndex: number): string {
+    return this.userConfigurations[userIndex].response.email!;
   }
 
-  public setEmail(userConfig: UserConfiguration, email: string): void {
-    userConfig.response.email = email;
+  public setEmail(userIndex: number, email: string): void {
+    this.userConfigurations[userIndex].response.email = email;
   }
 
-  public getEmailVerified(userConfig: UserConfiguration): boolean {
-    return userConfig.response.emailVerified!;
+  public getEmailVerified(userIndex: number): boolean {
+    return this.userConfigurations[userIndex].response.emailVerified!;
   }
 
   public setEmailVerified(
-    userConfig: UserConfiguration,
+    userIndex: number,
     emailVerified: boolean
   ): void {
-    userConfig.response.emailVerified = emailVerified;
+    this.userConfigurations[userIndex].response.emailVerified = emailVerified;
   }
 
-  public getPhoneNumber(userConfig: UserConfiguration): string {
-    return userConfig.response.phoneNumber!;
+  public getPhoneNumber(userIndex: number): string {
+    return this.userConfigurations[userIndex].response.phoneNumber!;
   }
 
   public setPhoneNumber(
-    userConfig: UserConfiguration,
+    userIndex: number,
     phoneNumber: string
   ): void {
-    userConfig.response.phoneNumber = phoneNumber;
+    this.userConfigurations[userIndex].response.phoneNumber = phoneNumber;
   }
 
-  public getPhoneNumberVerified(userConfig: UserConfiguration): boolean {
-    return userConfig.response.phoneNumberVerified!;
+  public getPhoneNumberVerified(userIndex: number): boolean {
+    return this.userConfigurations[userIndex].response.phoneNumberVerified!;
   }
 
   public setPhoneNumberVerified(
-    userConfig: UserConfiguration,
+    userIndex: number,
     phoneNumberVerified: boolean
   ): void {
-    userConfig.response.phoneNumberVerified = phoneNumberVerified;
+    this.userConfigurations[userIndex].response.phoneNumberVerified = phoneNumberVerified;
   }
 
-  public getMaxLoCAchieved(userConfig: UserConfiguration): string {
-    return userConfig.response.maxLoCAchieved!;
+  public getMaxLoCAchieved(userIndex: number): string {
+    return this.userConfigurations[userIndex].response.maxLoCAchieved!;
   }
 
   public setMaxLoCAchieved(
-    userConfig: UserConfiguration,
+    userIndex: number,
     maxLoCAchieved: string
   ): void {
-    userConfig.response.maxLoCAchieved = maxLoCAchieved;
+    this.userConfigurations[userIndex].response.maxLoCAchieved = maxLoCAchieved;
   }
 
   public getVerifiableIdentityCredentials(
-    userConfig: UserConfiguration
+    userIndex: number
   ): object | null {
-    return userConfig.response.coreIdentityVerifiableCredentials!;
+    return this.userConfigurations[userIndex].response.coreIdentityVerifiableCredentials!;
   }
 
   public setVerifiableIdentityCredentials(
-    userConfig: UserConfiguration,
+    userIndex: number,
     coreIdentityVerifiableCredentials: object | null
   ): void {
-    userConfig.response.coreIdentityVerifiableCredentials =
+    this.userConfigurations[userIndex].response.coreIdentityVerifiableCredentials =
       coreIdentityVerifiableCredentials;
   }
 
-  public getPassportDetails(userConfig: UserConfiguration): object[] | null {
-    return userConfig.response.passportDetails!;
+  public getPassportDetails(userIndex: number): object[] | null {
+    return this.userConfigurations[userIndex].response.passportDetails!;
   }
 
   public setPassportDetails(
-    userConfig: UserConfiguration,
+    userIndex: number,
     passportDetails: object[] | null
   ): void {
-    userConfig.response.passportDetails = passportDetails;
+    this.userConfigurations[userIndex].response.passportDetails = passportDetails;
   }
 
   public getDrivingPermitDetails(
-    userConfig: UserConfiguration
+    userIndex: number
   ): object[] | null {
-    return userConfig.response.drivingPermitDetails!;
+    return this.userConfigurations[userIndex].response.drivingPermitDetails!;
   }
 
   public setDrivingPermitDetails(
-    userConfig: UserConfiguration,
+    userIndex: number,
     drivingPermitDetails: object[] | null
   ): void {
-    userConfig.response.drivingPermitDetails = drivingPermitDetails;
-  }
-
-  public getSocialSecurityRecordDetails(
-    userConfig: UserConfiguration
-  ): object[] | null {
-    return userConfig.response.socialSecurityRecordDetails!;
-  }
-
-  public setSocialSecurityRecordDetails(
-    userConfig: UserConfiguration,
-    socialSecurityRecordDetails: object[] | null
-  ): void {
-    userConfig.response.socialSecurityRecordDetails =
-      socialSecurityRecordDetails;
+    this.userConfigurations[userIndex].response.drivingPermitDetails = drivingPermitDetails;
   }
 
   public getPostalAddressDetails(
-    userConfig: UserConfiguration
+    userIndex: number
   ): object[] | null {
-    return userConfig.response.postalAddressDetails!;
+    return this.userConfigurations[userIndex].response.postalAddressDetails!;
   }
 
   public setPostalAddressDetails(
-    userConfig: UserConfiguration,
+    userIndex: number,
     postalAddressDetails: object[] | null
   ): void {
-    userConfig.response.postalAddressDetails = postalAddressDetails;
+    this.userConfigurations[userIndex].response.postalAddressDetails = postalAddressDetails;
   }
 
-  public getReturnCodes(userConfig: UserConfiguration): ReturnCode[] | null {
-    return userConfig.response.returnCodes!;
+  public getReturnCodes(userIndex: number): ReturnCode[] | null {
+    return this.userConfigurations[userIndex].response.returnCodes!;
   }
 
   public setReturnCodes(
-    userConfig: UserConfiguration,
+    userIndex: number,
     returnCodes: ReturnCode[] | null
   ): void {
-    userConfig.response.returnCodes = returnCodes;
+    this.userConfigurations[userIndex].response.returnCodes = returnCodes;
   }
 
   public getAuthCodeRequestParams(
@@ -437,44 +417,44 @@ CQIDAQAB
   }
 
   public getErrorConfiguration(
-    userConfig: UserConfiguration
+    userIndex: number
   ): ErrorConfiguration {
-    return userConfig.error;
+    return this.userConfigurations[userIndex].error;
   }
 
   public getCoreIdentityErrors(
-    userConfig: UserConfiguration
+    userIndex: number
   ): CoreIdentityError[] {
-    return userConfig.error.coreIdentityErrors!;
+    return this.userConfigurations[userIndex].error.coreIdentityErrors!;
   }
 
   public setCoreIdentityErrors(
-    userConfig: UserConfiguration,
+    userIndex: number,
     coreIdentityErrors: CoreIdentityError[]
   ): void {
-    userConfig.error.coreIdentityErrors = coreIdentityErrors;
+    this.userConfigurations[userIndex].error.coreIdentityErrors = coreIdentityErrors;
   }
 
-  public getIdTokenErrors(userConfig: UserConfiguration): IdTokenError[] {
-    return userConfig.error.idTokenErrors!;
+  public getIdTokenErrors(userIndex: number): IdTokenError[] {
+    return this.userConfigurations[userIndex].error.idTokenErrors!;
   }
 
   public setIdTokenErrors(
-    userConfig: UserConfiguration,
+    userIndex: number,
     idTokenErrors: IdTokenError[]
   ): void {
-    userConfig.error.idTokenErrors = idTokenErrors;
+    this.userConfigurations[userIndex].error.idTokenErrors = idTokenErrors;
   }
 
-  public getAuthoriseErrors(userConfig: UserConfiguration): AuthoriseError[] {
-    return userConfig.error.authoriseErrors!;
+  public getAuthoriseErrors(userIndex: number): AuthoriseError[] {
+    return this.userConfigurations[userIndex].error.authoriseErrors!;
   }
 
   public setAuthoriseErrors(
-    userConfig: UserConfiguration,
+    userIndex: number,
     authoriseErrors: AuthoriseError[]
   ): void {
-    userConfig.error.authoriseErrors = authoriseErrors;
+    this.userConfigurations[userIndex].error.authoriseErrors = authoriseErrors;
   }
 
   public getSimulatorUrl(): string {

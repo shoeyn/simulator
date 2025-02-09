@@ -1,14 +1,21 @@
 extends layouts/layout
 
 block content
-    <form class="govuk-form-group" method="GET">
-        <h1 class="govuk-label-wrapper">
-            <label class="govuk-label govuk-label--l" for="event-name">
-                What user sub are you logging in as?
-            </label>
-        </h1>
-        <input class="govuk-input" id="user-sub" name="sub" type="text">
-        <button type="submit" class="govuk-button" data-module="govuk-button">
-            Save and continue
-        </button>
-    </form>
+    form(method="GET")
+        input(type="hidden" name="client_id" value=client_id)
+        input(type="hidden" name="redirect_uri" value=redirect_uri)
+        input(type="hidden" name="response_type" value=response_type)
+        input(type="hidden" name="scope" value=scope)
+        input(type="hidden" name="state" value=state)
+        input(type="hidden" name="claims" value=claims)
+        input(type="hidden" name="nonce" value=nonce)
+        input(type="hidden" name="prompt" value=prompt)
+        input(type="hidden" name="vtr" value=vtr)
+        input(type="hidden" name="ui_locales" value=ui_locales)
+        div.govuk-form-group
+            h1.govuk-label-wrapper
+                label.govuk-label.govuk-label--l(for="event-name")
+                    | What user sub are you logging in as?
+            input.govuk-input#user-sub(name="sub" type="text")
+        button.govuk-button(type="submit" data-module="govuk-button")
+            | Save and continue

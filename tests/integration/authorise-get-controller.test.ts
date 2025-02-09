@@ -1141,8 +1141,8 @@ describe("Auth requests using request objects", () => {
 
     it("returns a 302 with access denied if error configuration includes ACCESS_DENIED", async () => {
       const config = Config.getInstance();
-      const userConfig = Config.getUserConfiguration("testSub");
-      config.setAuthoriseErrors(userConfig, ["ACCESS_DENIED"]);
+      const userIndex = config.getUserIndex("testSub");
+      config.setAuthoriseErrors(userIndex, ["ACCESS_DENIED"]);
 
       const app = createApp();
       const requestParams = createRequestParams({

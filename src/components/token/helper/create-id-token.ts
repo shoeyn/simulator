@@ -19,7 +19,7 @@ export const createIdToken = async (
 ): Promise<string> => {
   logger.info("Creating Id token");
   const config = Config.getInstance();
-  const userConfig = Config.getUserConfiguration(authRequestParams.sub);
+  const userIndex = config.getUserIndex(authRequestParams.sub);
 
   const idTokenClaims = createIdTokenClaimSet(
     config,
@@ -27,7 +27,7 @@ export const createIdToken = async (
     accessToken
   );
 
-  const idTokenErrors = config.getIdTokenErrors(userConfig);
+  const idTokenErrors = config.getIdTokenErrors(userIndex);
 
   let signedIdToken = await signToken(idTokenClaims);
 
@@ -48,8 +48,8 @@ const createIdTokenClaimSet = (
   authRequestParams: AuthRequestParameters,
   accessToken: string
 ): IdTokenClaims => {
-  const userConfig = Config.getUserConfiguration(authRequestParams.sub);
-  const idTokenErrors = config.getIdTokenErrors(userConfig);
+  const userIndex = config.getUserIndex(authRequestParams.sub);
+  const idTokenErrors = config.getIdTokenErrors(userIndex);
   const timeNow = Math.floor(Date.now() / 1000);
   const iat = idTokenErrors.includes("TOKEN_NOT_VALID_YET")
     ? timeNow + ONE_DAY_IN_SECONDS

@@ -5,7 +5,7 @@ import {
   UserInfo,
 } from "../../types/user-info";
 import { userInfoRequestValidator } from "../../validators/user-info-request-validator";
-import { Config, UserConfiguration } from "../../config";
+import { Config } from "../../config";
 import { UserInfoRequestError } from "../../errors/user-info-request-error";
 import { importPKCS8, JWTPayload, SignJWT } from "jose";
 import {
@@ -41,20 +41,20 @@ export const userInfoController = async (
   logger.info("Successfully validated access token.");
 
   const config = Config.getInstance();
-  const userConfig = Config.getUserConfiguration(validationResult.sub);
+  const userIndex = config.getUserIndex(validationResult.sub);
 
   const userInfo: UserInfo = {
     sub: validationResult.sub,
   };
 
   if (validationResult.scopes.includes("email")) {
-    userInfo.email = config.getEmail(userConfig);
-    userInfo.email_verified = config.getEmailVerified(userConfig);
+    userInfo.email = config.getEmail(userIndex);
+    userInfo.email_verified = config.getEmailVerified(userIndex);
   }
 
   if (validationResult.scopes.includes("phone")) {
-    userInfo.phone_number = config.getPhoneNumber(userConfig) || undefined;
-    userInfo.phone_number_verified = config.getPhoneNumberVerified(userConfig);
+    userInfo.phone_number = config.getPhoneNumber(userIndex) || undefined;
+    userInfo.phone_number_verified = config.getPhoneNumberVerified(userIndex);
   }
 
   const claims = validationResult.claims;
@@ -62,33 +62,27 @@ export const userInfoController = async (
     userInfo,
     claims,
     "https://vocab.account.gov.uk/v1/drivingPermit",
-    config.getDrivingPermitDetails(userConfig)
+    config.getDrivingPermitDetails(userIndex)
   );
   tryAddClaim(
     userInfo,
     claims,
     "https://vocab.account.gov.uk/v1/passport",
-    config.getPassportDetails(userConfig)
-  );
-  tryAddClaim(
-    userInfo,
-    claims,
-    "https://vocab.account.gov.uk/v1/socialSecurityRecord",
-    config.getSocialSecurityRecordDetails(userConfig)
+    config.getPassportDetails(userIndex)
   );
   tryAddClaim(
     userInfo,
     claims,
     "https://vocab.account.gov.uk/v1/address",
-    config.getPostalAddressDetails(userConfig)
+    config.getPostalAddressDetails(userIndex)
   );
   tryAddClaim(
     userInfo,
     claims,
     "https://vocab.account.gov.uk/v1/returnCode",
-    config.getReturnCodes(userConfig)
+    config.getReturnCodes(userIndex)
   );
-  await tryAddCoreIdentityJwt(userInfo, claims, config, userConfig);
+  await tryAddCoreIdentityJwt(userInfo, claims, config, userIndex);
 
   res.status(200);
   res.send(userInfo);
@@ -116,12 +110,12 @@ const tryAddCoreIdentityJwt = async (
   userInfo: UserInfo,
   requestedClaims: UserIdentityClaim[],
   config: Config,
-  userConfig: UserConfiguration
+  userIndex: number
 ): Promise<void> => {
   const claim: UserIdentityClaim =
     "https://vocab.account.gov.uk/v1/coreIdentityJWT";
-  const vc = config.getVerifiableIdentityCredentials(userConfig);
-  const coreIdentityErrors = config.getCoreIdentityErrors(userConfig);
+  const vc = config.getVerifiableIdentityCredentials(userIndex);
+  const coreIdentityErrors = config.getCoreIdentityErrors(userIndex);
 
   if (requestedClaims.includes(claim)) {
     if (!vc) {
@@ -134,7 +128,7 @@ const tryAddCoreIdentityJwt = async (
     const timeNowSeconds = Math.floor(Date.now() / 1000);
     const oneDayTimeOffsetSeconds = 24 * 60 * 60;
     const coreIdentity = {
-      vot: config.getMaxLoCAchieved(userConfig),
+      vot: config.getMaxLoCAchieved(userIndex),
       vc: vc,
       vtm: config.getTrustmarkUrl(),
       iss: coreIdentityErrors.includes("INVALID_ISS")
@@ -142,7 +136,7 @@ const tryAddCoreIdentityJwt = async (
         : config.getIssuerValue(),
       sub: coreIdentityErrors.includes("INCORRECT_SUB")
         ? randomBytes(32).toString()
-        : userConfig.response.sub,
+        : config.getResponseConfiguration(userIndex).sub,
       nbf: timeNowSeconds,
       exp: coreIdentityErrors.includes("TOKEN_EXPIRED")
         ? timeNowSeconds - oneDayTimeOffsetSeconds

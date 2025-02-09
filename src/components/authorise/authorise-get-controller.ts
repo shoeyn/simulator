@@ -64,13 +64,13 @@ export const authoriseController = async (
     }
 
     if (!req.query.sub) {
-      res.render("get-sub");
+      res.render("get-sub", req.query);
       return;
     }
 
-    const userConfig = Config.getUserConfiguration(req.query.sub as string);
+    const userIndex = config.getUserIndex(req.query.sub as string);
 
-    if (config.getAuthoriseErrors(userConfig).includes("ACCESS_DENIED")) {
+    if (config.getAuthoriseErrors(userIndex).includes("ACCESS_DENIED")) {
       logger.warn("Client configured to return access_denied error response");
       throw new AuthoriseRequestError({
         errorCode: "access_denied",

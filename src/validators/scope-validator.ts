@@ -19,7 +19,9 @@ export const areScopesValid = (scopes: string[], config: Config): boolean => {
   if (unsupportedScopes.length > 0) {
     logger.warn(
       "Request included scopes not supported by the client: " +
-        unsupportedScopes.join(", ")
+        unsupportedScopes.join(", ") +
+        " out of: " +
+        clientScopes.join(", ")
     );
     return false;
   }

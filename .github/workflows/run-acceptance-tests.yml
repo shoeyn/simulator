@@ -48,19 +48,7 @@ jobs:
       - name: Install dependencies
         run: npm install
       - name: Run acceptance tests
-        run: npm run acceptance-test
-      - name: Notify on failure
-        if: ${{ failure() }}
-        uses: slackapi/slack-github-action@v2.0.0
-        with:
-          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
-          webhook-type: webhook-trigger
-          payload: |
-            channel_id: "${{ secrets.SLACK_CHANNEL_ID }}"
-            github_repo: "${{ github.repository }}"
-            message: "Simulator acceptance tests have failed"
-            aws_account: "N/A"
-            level: "ERROR"
+        run: npm run acceptance-test"
       - name: Stop Docker
         if: ${{ always() }}
         run: cd tests/acceptance/micro-rp && docker compose down

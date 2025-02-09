@@ -12,6 +12,7 @@ import { body, checkExact } from "express-validator";
 import { didController } from "./components/did/did-controller";
 import { logoutController } from "./components/logout/logout-controller";
 import { getConfigController } from "./components/config/get-config-controller";
+import path from "node:path";
 
 const createApp = (): Application => {
   const app: Express = express();
@@ -19,9 +20,14 @@ const createApp = (): Application => {
   app.use(express.json());
   app.use(express.urlencoded({ extended: false }));
   app.use(dedupeQueryParams);
+  app.set('views', path.join(__dirname, 'views'));
+  app.set('view engine', 'pug');
+
+  app.use('/assets', express.static(path.join(__dirname, '../node_modules/govuk-frontend/dist/govuk/assets')));
+  app.use('/assets/application.css', express.static(path.join(__dirname, '../node_modules/govuk-frontend/dist/govuk/govuk-frontend.min.css')));
 
   app.get("/", (req: Request, res: Response) => {
-    res.send("Express + TypeScript Server");
+    res.render("home");
   });
   app.use("/authorize", authoriseController);
 

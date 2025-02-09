@@ -7,11 +7,10 @@ To run the stub locally, you can simply run `docker compose up --build`.
 If you would like to run it alongside an RP running locally in Docker, you'll need to turn on Docker host networking.
 This requires v4.34 or higher of Docker Desktop. In Docker Desktop, go into Settings -> Resources -> Network, and tick
 `Enable host networking`. In your docker compose file for the RP, add `network_mode: host` under the service that you're running.
-<br />
 
-### Development environment setup:
+### Development environment setup
 
-_Please ensure you are using the correct node version locally (Found in Dockerfile)_
+Please ensure you are using the correct node version locally (Found in Dockerfile)
 
 #### Build
 
@@ -29,11 +28,9 @@ npm install && npm run build
 npm run build && npm run start
 ```
 
-<br />
-
 ## Formatting & Linting
 
-### Scripts:
+### Scripts
 
 > To check:
 
@@ -65,7 +62,7 @@ npm run prepare
 npm run test
 ```
 
-## Using the simulator:
+## Using the simulator
 
 The GOV.UK One Login simulator is a development tool that lets you run end-to-end tests, so you can:
 
@@ -88,7 +85,7 @@ sequenceDiagram
      RP->>Simulator:/userinfo
 ```
 
-### RP Requirements to use the Simulator:
+### RP Requirements to use the Simulator
 
 The simulator aims to mirror GOV.UK One Login but does not support all of the features, therefore there are some limitations to what RP features it supports:
 
@@ -98,7 +95,7 @@ The simulator aims to mirror GOV.UK One Login but does not support all of the fe
 
 ## Configuration
 
-### Setting up configuration:
+### Setting up configuration
 
 The client, response and error configuration for the simulator can be set up in one of two ways:
 
@@ -112,7 +109,7 @@ Parameters provided as environment variables that are parsed as an array should 
 
 Where values are not provided for the configuration, [default values](#default-configuration-values) will be used. Some provided configuration fields may be ignored if they are not valid.
 
-### Getting the configuration:
+### Getting the configuration
 
 To get the current configuration of the simulator, a GET request can be made to the `/config` endpoint. This returns the client configuration, response configuration and error configuration, as well as the url the simulator is running on, in the body of the response.
 
@@ -136,13 +133,13 @@ The table below describes the different fields for the client configuration. Whe
 | Public Key                      | The public key which should be used to validate the client_assertion signature                  | `PUBLIC_KEY`                      | publicKey                     | PEM encoded public key                                                                                                                                                                                                                                                                           |
 | Scopes                          | The scopes which the client is configured to request                                            | `SCOPES`                          | scopes                        | "openid", "email", "phone"                                                                                                                                                                                                                                                                       |
 | Redirect URLs                   | The redirect URLs for the client, which a user will be redirected to                            | `REDIRECT_URLS`                   | redirectUrls                  | Any valid URLs                                                                                                                                                                                                                                                                                   |
-| Claims                          | The claims which the client is configured to request                                            | `CLAIMS`                          | claims                        | "https://vocab.account.gov.uk/v1/passport", "https://vocab.account.gov.uk/v1/address", "https://vocab.account.gov.uk/v1/drivingPermit", "https://vocab.account.gov.uk/v1/socialSecurityRecord", "https://vocab.account.gov.uk/v1/coreIdentityJWT", "https://vocab.account.gov.uk/v1/returnCode", |
+| Claims                          | The claims which the client is configured to request                                            | `CLAIMS`                          | claims                        | "<https://vocab.account.gov.uk/v1/passport>", "<https://vocab.account.gov.uk/v1/address>", "<https://vocab.account.gov.uk/v1/drivingPermit>", "<https://vocab.account.gov.uk/v1/coreIdentityJWT>", "<https://vocab.account.gov.uk/v1/returnCode>", |
 | Identity Verification Supported | Whether or not the client has identity verification enabled                                     | `IDENTITY_VERIFICATION_SUPPORTED` | identityVerificationSupported | boolean                                                                                                                                                                                                                                                                                          |
 | ID Token Signing Algorithm      | The algorithm which the id token should be signed with                                          | `ID_TOKEN_SIGNING_ALGORITHM`      | idTokenSigningAlgorithm       | "ES256" or "RS256"                                                                                                                                                                                                                                                                               |
 | Client Levels of Confidence     | The levels of confidence values which the client can request                                    | `CLIENT_LOCS`                     | clientLoCs                    | "P0", "P1", "P2"                                                                                                                                                                                                                                                                                 |
 | Post Logout redirect URIs       | The redirect URIs configured for a client for a user to be redirected to after being logged out | `POST_LOGOUT_REDIRECT_URLS`       | postLogoutRedirectUrls        | Any valid URLs                                                                                                                                                                                                                                                                                   |
 
-### Response Configuration:
+### Response Configuration
 
 The table below describes the different fields for the response configuration. When updating the response config using the `/config` endpoint, the following JSON structure is required in the request body:
 
@@ -169,13 +166,12 @@ Some response configuration fields are not available to be set as environment va
 | coreIdentityVerifiableCredentials | A core identity Verifiable credential                                                                                                                                                                | N/A                   | coreIdentityVerifiableCredentials | JSON Object                                                       |
 | passportDetails                   | A set of passport details to be returned                                                                                                                                                             | N/A                   | passportDetails                   | JSON Array                                                        |
 | drivingPermitDetails              | A set of driving license details to be returned                                                                                                                                                      | N/A                   | drivingPermitDetails              | JSON Array                                                        |
-| socialSecurityRecordDetails       | A set of social security record details to be returned                                                                                                                                               | N/A                   | socialSecurityRecordDetails       | JSON Array                                                        |
 | postalAddressDetails              | A set of address details to be returned                                                                                                                                                              | N/A                   | postalAddressDetails              | JSON Array                                                        |
 | returnCodes                       | A set of return codes to be returned if the return code claim is included in the client configuration and `/authorize` request. Otherwise an ACCESS_DENIED error is returned when this is configured | N/A                   | returnCodes                       | JSON Array with the following structure `[{"code": "anyString"}]` |
 
 Where the above valid values are JSON objects/JSON arrays, no further validation is done on the provided response configuration unless outlined. You should consult the technical docs for examples of what these fields should look like.
 
-### Error configuration:
+### Error configuration
 
 You can setup the simulator to return specific error scenarios at the `/authorize` endpoint, and in the Core Identity JWT and ID Token issued. There are no defaults configured for the error configuration, so you must provide these if you wish to enable the simulator to return an error.
 
@@ -196,7 +192,7 @@ Alternatively these can be set using the `/config` endpoint with the following s
 
 Any invalid values for the error configuration will be ignored.
 
-#### Authorise errors:
+#### Authorise errors
 
 These are errors returned at the point in which a user hits the `/authorize` endpoint
 
@@ -204,7 +200,7 @@ These are errors returned at the point in which a user hits the `/authorize` end
 | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | ACCESS_DENIED | Returns the access denied error that would be returned to an RP when a user has issues with identity, but does not have return codes switched on. It is returned just before an auth code is generated |
 
-#### ID token errors:
+#### ID token errors
 
 These are errors which are present in the issued ID token
 
@@ -219,7 +215,7 @@ These are errors which are present in the issued ID token
 | NONCE_NOT_MATCHING  | The nonce in the token does not match the nonce supplied in the /authorize request.                                          |
 | INCORRECT_VOT       | The vector of trust (vot) returned in the token does not match the vector of trust requested (vtr) in the /authorize request |
 
-#### Core Identity errors:
+#### Core Identity errors
 
 These are errors which are present in the issued Core Identity JWT.
 
@@ -237,7 +233,7 @@ To remove an error configuration, you can either unset the environment variables
 > [!NOTE]  
 > Anytime you update your configuration using the `/config` endpoint you **must** include the errorConfiguration if you wish to maintain the configured errors
 
-#### URL configuration:
+#### URL configuration
 
 You may wish to deploy the simulator and you can therefore configure the URL at which the simulator is hosted. This is done via the environment variable: `SIMULATOR_URL`.
 Alternatively the url can be updated using the `/config` endpoint with the following request body field:
@@ -252,7 +248,7 @@ Alternatively the url can be updated using the `/config` endpoint with the follo
 
 > For example: The token endpoint will become`${SIMULATOR_URL}/token`, so the expected audience of the client assertion should be updated to reflect this.
 
-#### Default configuration values:
+#### Default configuration values
 
 The default values for each configurable field are outlined below:
 
@@ -275,7 +271,6 @@ The default values for each configurable field are outlined below:
 | coreIdentityVerifiableCredentials | `{"type":["VerifiableCredential","IdentityCheckCredential"],"credentialSubject":{"name":[{"nameParts":[{"value":"GEOFFREY","type":"GivenName"},{"value":"HEARNSHAW","type":"FamilyName"}]}],"birthDate":[{"value":"1955-04-19"}]}}`                                                                                                                                                                                                                          |
 | passportDetails                   | `null`                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | drivingPermitDetails              | `null`                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-| socialSecurityRecordDetails       | `null`                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | postalAddressDetails              | `{"postalAddressDetails":[{"addressCountry":"GB","buildingName":"","streetName":"FRAMPTON ROAD","postalCode":"GL1 5QB","buildingNumber":"26","addressLocality":"GLOUCESTER","validFrom":"2000-01-01","uprn":100120472196,"subBuildingName":""}]}`                                                                                                                                                                                                            |
 | returnCodes                       | `null`                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | simulatorUrl                      | `http://localhost:3000`                                                                                                                                                                                                                                                                                                                                                                                                                                      |
@@ -283,7 +278,7 @@ The default values for each configurable field are outlined below:
 
 The private key for the default public key is:
 
-```
+```text
 -----BEGIN PRIVATE KEY-----
 MIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQCZddHcSxG9QxWE
 Qky1DXB7EmN9DTRDQxDsBF9KE3ncGc5AQ8WdL8jye0F12Qp0Ter68xMjvbDoW/dK
