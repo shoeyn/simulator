@@ -91,7 +91,7 @@ export const authoriseController = async (
         redirectUri: parsedAuthRequest.redirect_uri,
         scopes: parsedAuthRequest.scope,
         vtr: (parsedAuthRequest.vtr as VectorOfTrust[])[0],
-      }
+      },
     });
 
     res.redirect(

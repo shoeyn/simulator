@@ -8,5 +8,5 @@ export default interface AuthRequestParameters {
     scopes: string[];
     claims: string[];
     vtr: VectorOfTrust;
-  }
+  };
 }

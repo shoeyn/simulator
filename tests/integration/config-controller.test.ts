@@ -79,12 +79,16 @@ describe("Integration: Config POST", () => {
     expect(config.getEmail(userConfig)).toEqual(TEST_EMAIL);
     expect(config.getEmailVerified(userConfig)).toEqual(TEST_EMAIL_VERIFIED);
     expect(config.getPhoneNumber(userConfig)).toEqual(TEST_PHONE_NUMBER);
-    expect(config.getPhoneNumberVerified(userConfig)).toEqual(TEST_PHONE_NUMBER_VERIFIED);
+    expect(config.getPhoneNumberVerified(userConfig)).toEqual(
+      TEST_PHONE_NUMBER_VERIFIED
+    );
     expect(config.getCoreIdentityErrors(userConfig)).toStrictEqual([
       "INVALID_ALG_HEADER",
     ]);
     expect(config.getIdTokenErrors(userConfig)).toStrictEqual(["INVALID_ISS"]);
-    expect(config.getAuthoriseErrors(userConfig)).toStrictEqual(["ACCESS_DENIED"]);
+    expect(config.getAuthoriseErrors(userConfig)).toStrictEqual([
+      "ACCESS_DENIED",
+    ]);
     expect(config.getSimulatorUrl()).toStrictEqual(TEST_SIMULATOR_URL);
   });
 
@@ -138,9 +142,15 @@ describe("Integration: Config POST", () => {
     const config = Config.getInstance();
     const userConfig = Config.getUserConfiguration(TEST_SUB);
 
-    config.setCoreIdentityErrors(userConfig, ["INCORRECT_SUB", "INVALID_ALG_HEADER"]);
-    config.setIdTokenErrors(userConfig, ["INCORRECT_VOT", "INVALID_ALG_HEADER"]);
-    
+    config.setCoreIdentityErrors(userConfig, [
+      "INCORRECT_SUB",
+      "INVALID_ALG_HEADER",
+    ]);
+    config.setIdTokenErrors(userConfig, [
+      "INCORRECT_VOT",
+      "INVALID_ALG_HEADER",
+    ]);
+
     const app = createApp();
     const response = await request(app)
       .post("/config")

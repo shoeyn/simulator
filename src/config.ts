@@ -17,13 +17,13 @@ import { UserIdentityClaim } from "./types/user-info";
 
 export type UserConfiguration = {
   error: ErrorConfiguration;
-  response: ResponseConfiguration
-}
+  response: ResponseConfiguration;
+};
 
 export class Config {
   private static instance: Config;
 
-  private userConfigurations: UserConfiguration[] = []
+  private userConfigurations: UserConfiguration[] = [];
   private clientConfiguration: ClientConfiguration;
   private authCodeRequestParamsStore: Record<string, AuthRequestParameters>;
   private accessTokenStore: AccessTokenStore;
@@ -141,8 +141,9 @@ CQIDAQAB
         idTokenErrors:
           process.env.ID_TOKEN_ERRORS?.split(",").filter(isIdTokenError) ?? [],
         authoriseErrors:
-          process.env.AUTHORISE_ERRORS?.split(",").filter(isAuthoriseError) ?? [],
-      }
+          process.env.AUTHORISE_ERRORS?.split(",").filter(isAuthoriseError) ??
+          [],
+      },
     };
   }
 
@@ -160,21 +161,25 @@ CQIDAQAB
   public static getUserConfiguration(sub: string): UserConfiguration {
     const config = Config.getInstance();
 
-    const userConfig = config.userConfigurations.find(u => u.response.sub === sub);
+    const userConfig = config.userConfigurations.find(
+      (u) => u.response.sub === sub
+    );
     if (userConfig) {
       return userConfig;
     }
-    
+
     const newConfig = Config.newUserConfig();
     newConfig.response.sub = sub;
     config.userConfigurations.push(newConfig);
-    
+
     return newConfig;
   }
 
   public static deleteUserConfiguration(sub: string): void {
     const config = Config.getInstance();
-    const i = config.userConfigurations.findIndex(u => u.response.sub === sub);
+    const i = config.userConfigurations.findIndex(
+      (u) => u.response.sub === sub
+    );
 
     if (i > -1) {
       config.userConfigurations.splice(i);
@@ -260,7 +265,9 @@ CQIDAQAB
     this.clientConfiguration.clientLoCs = clientLoCs;
   }
 
-  public getResponseConfiguration(userConfig: UserConfiguration): ResponseConfiguration {
+  public getResponseConfiguration(
+    userConfig: UserConfiguration
+  ): ResponseConfiguration {
     return userConfig.response;
   }
 
@@ -280,7 +287,10 @@ CQIDAQAB
     return userConfig.response.emailVerified!;
   }
 
-  public setEmailVerified(userConfig: UserConfiguration, emailVerified: boolean): void {
+  public setEmailVerified(
+    userConfig: UserConfiguration,
+    emailVerified: boolean
+  ): void {
     userConfig.response.emailVerified = emailVerified;
   }
 
@@ -288,7 +298,10 @@ CQIDAQAB
     return userConfig.response.phoneNumber!;
   }
 
-  public setPhoneNumber(userConfig: UserConfiguration, phoneNumber: string): void {
+  public setPhoneNumber(
+    userConfig: UserConfiguration,
+    phoneNumber: string
+  ): void {
     userConfig.response.phoneNumber = phoneNumber;
   }
 
@@ -296,7 +309,10 @@ CQIDAQAB
     return userConfig.response.phoneNumberVerified!;
   }
 
-  public setPhoneNumberVerified(userConfig: UserConfiguration, phoneNumberVerified: boolean): void {
+  public setPhoneNumberVerified(
+    userConfig: UserConfiguration,
+    phoneNumberVerified: boolean
+  ): void {
     userConfig.response.phoneNumberVerified = phoneNumberVerified;
   }
 
@@ -304,11 +320,16 @@ CQIDAQAB
     return userConfig.response.maxLoCAchieved!;
   }
 
-  public setMaxLoCAchieved(userConfig: UserConfiguration, maxLoCAchieved: string): void {
+  public setMaxLoCAchieved(
+    userConfig: UserConfiguration,
+    maxLoCAchieved: string
+  ): void {
     userConfig.response.maxLoCAchieved = maxLoCAchieved;
   }
 
-  public getVerifiableIdentityCredentials(userConfig: UserConfiguration): object | null {
+  public getVerifiableIdentityCredentials(
+    userConfig: UserConfiguration
+  ): object | null {
     return userConfig.response.coreIdentityVerifiableCredentials!;
   }
 
@@ -324,19 +345,29 @@ CQIDAQAB
     return userConfig.response.passportDetails!;
   }
 
-  public setPassportDetails(userConfig: UserConfiguration, passportDetails: object[] | null): void {
+  public setPassportDetails(
+    userConfig: UserConfiguration,
+    passportDetails: object[] | null
+  ): void {
     userConfig.response.passportDetails = passportDetails;
   }
 
-  public getDrivingPermitDetails(userConfig: UserConfiguration): object[] | null {
+  public getDrivingPermitDetails(
+    userConfig: UserConfiguration
+  ): object[] | null {
     return userConfig.response.drivingPermitDetails!;
   }
 
-  public setDrivingPermitDetails(userConfig: UserConfiguration, drivingPermitDetails: object[] | null): void {
+  public setDrivingPermitDetails(
+    userConfig: UserConfiguration,
+    drivingPermitDetails: object[] | null
+  ): void {
     userConfig.response.drivingPermitDetails = drivingPermitDetails;
   }
 
-  public getSocialSecurityRecordDetails(userConfig: UserConfiguration): object[] | null {
+  public getSocialSecurityRecordDetails(
+    userConfig: UserConfiguration
+  ): object[] | null {
     return userConfig.response.socialSecurityRecordDetails!;
   }
 
@@ -348,11 +379,16 @@ CQIDAQAB
       socialSecurityRecordDetails;
   }
 
-  public getPostalAddressDetails(userConfig: UserConfiguration): object[] | null {
+  public getPostalAddressDetails(
+    userConfig: UserConfiguration
+  ): object[] | null {
     return userConfig.response.postalAddressDetails!;
   }
 
-  public setPostalAddressDetails(userConfig: UserConfiguration, postalAddressDetails: object[] | null): void {
+  public setPostalAddressDetails(
+    userConfig: UserConfiguration,
+    postalAddressDetails: object[] | null
+  ): void {
     userConfig.response.postalAddressDetails = postalAddressDetails;
   }
 
@@ -360,7 +396,10 @@ CQIDAQAB
     return userConfig.response.returnCodes!;
   }
 
-  public setReturnCodes(userConfig: UserConfiguration, returnCodes: ReturnCode[] | null): void {
+  public setReturnCodes(
+    userConfig: UserConfiguration,
+    returnCodes: ReturnCode[] | null
+  ): void {
     userConfig.response.returnCodes = returnCodes;
   }
 
@@ -397,15 +436,22 @@ CQIDAQAB
     ];
   }
 
-  public getErrorConfiguration(userConfig: UserConfiguration): ErrorConfiguration {
+  public getErrorConfiguration(
+    userConfig: UserConfiguration
+  ): ErrorConfiguration {
     return userConfig.error;
   }
 
-  public getCoreIdentityErrors(userConfig: UserConfiguration): CoreIdentityError[] {
+  public getCoreIdentityErrors(
+    userConfig: UserConfiguration
+  ): CoreIdentityError[] {
     return userConfig.error.coreIdentityErrors!;
   }
 
-  public setCoreIdentityErrors(userConfig: UserConfiguration, coreIdentityErrors: CoreIdentityError[]): void {
+  public setCoreIdentityErrors(
+    userConfig: UserConfiguration,
+    coreIdentityErrors: CoreIdentityError[]
+  ): void {
     userConfig.error.coreIdentityErrors = coreIdentityErrors;
   }
 
@@ -413,7 +459,10 @@ CQIDAQAB
     return userConfig.error.idTokenErrors!;
   }
 
-  public setIdTokenErrors(userConfig: UserConfiguration, idTokenErrors: IdTokenError[]): void {
+  public setIdTokenErrors(
+    userConfig: UserConfiguration,
+    idTokenErrors: IdTokenError[]
+  ): void {
     userConfig.error.idTokenErrors = idTokenErrors;
   }
 
@@ -421,7 +470,10 @@ CQIDAQAB
     return userConfig.error.authoriseErrors!;
   }
 
-  public setAuthoriseErrors(userConfig: UserConfiguration, authoriseErrors: AuthoriseError[]): void {
+  public setAuthoriseErrors(
+    userConfig: UserConfiguration,
+    authoriseErrors: AuthoriseError[]
+  ): void {
     userConfig.error.authoriseErrors = authoriseErrors;
   }
 

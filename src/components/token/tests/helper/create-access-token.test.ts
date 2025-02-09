@@ -95,7 +95,12 @@ describe("createAccessToken tests", () => {
       credentialTrust: "Cl.Cm",
       levelOfConfidence: "P2",
     };
-    const accessToken = await createAccessToken(testSubClaim, ["openid"], vtr, null);
+    const accessToken = await createAccessToken(
+      testSubClaim,
+      ["openid"],
+      vtr,
+      null
+    );
     const tokenParts = accessToken.split(".");
 
     const payload = decodeTokenPart(tokenParts[1]);
@@ -108,7 +113,12 @@ describe("createAccessToken tests", () => {
       credentialTrust: "Cl",
       levelOfConfidence: null,
     };
-    const accessToken = await createAccessToken(testSubClaim, ["openid"], vtr, VALID_CLAIMS);
+    const accessToken = await createAccessToken(
+      testSubClaim,
+      ["openid"],
+      vtr,
+      VALID_CLAIMS
+    );
     const tokenParts = accessToken.split(".");
 
     const payload = decodeTokenPart(tokenParts[1]);

@@ -9,7 +9,12 @@ import { UserIdentityClaim, UserScope } from "../types/user-info";
 export const userInfoRequestValidator = async (
   userInfoRequestHeaders: IncomingHttpHeaders
 ): Promise<
-  | { valid: true; sub: string; claims: UserIdentityClaim[]; scopes: UserScope[] }
+  | {
+      valid: true;
+      sub: string;
+      claims: UserIdentityClaim[];
+      scopes: UserScope[];
+    }
   | {
       valid: false;
       error: UserInfoRequestError;
@@ -73,12 +78,22 @@ export const userInfoRequestValidator = async (
 
   if (!config_identity_supported) {
     logger.info("Identity not supported - ignoring claims.");
-    return { valid: true, sub: sub ?? "", claims: [], scopes: scope as UserScope[] };
+    return {
+      valid: true,
+      sub: sub ?? "",
+      claims: [],
+      scopes: scope as UserScope[],
+    };
   }
 
   if (claims == null || (Array.isArray(claims) && claims.length == 0)) {
     logger.info("No identity claims in access token.");
-    return { valid: true, sub: sub ?? "", claims: [], scopes: scope as UserScope[] };
+    return {
+      valid: true,
+      sub: sub ?? "",
+      claims: [],
+      scopes: scope as UserScope[],
+    };
   }
 
   logger.info("Identity claims present in access token.");

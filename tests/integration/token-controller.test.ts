@@ -51,7 +51,7 @@ const validAuthRequestParams: AuthRequestParameters = {
       credentialTrust: "Cl.Cm",
       levelOfConfidence: "P2",
     },
-  }
+  },
 };
 const redirectUriMismatchParams: AuthRequestParameters = {
   sub: knownSub,
@@ -64,7 +64,7 @@ const redirectUriMismatchParams: AuthRequestParameters = {
       credentialTrust: "Cl.Cm",
       levelOfConfidence: null,
     },
-  }
+  },
 };
 
 const createValidClientAssertion = async (
@@ -534,7 +534,9 @@ describe("/token endpoint, configured error responses", () => {
     const response = await request(app).post(TOKEN_ENDPOINT).send(validRequest);
     const { id_token } = response.body;
     const { payload } = decodeJwtNoVerify(id_token);
-    expect(payload.vot).not.toEqual(validAuthRequestParams.params.vtr.credentialTrust);
+    expect(payload.vot).not.toEqual(
+      validAuthRequestParams.params.vtr.credentialTrust
+    );
     expect(payload.vot).toBe("Cl");
   });
 
@@ -728,7 +730,9 @@ describe("/token endpoint valid client_assertion", () => {
     expect(decodedIdToken.payload.vtm).toBe("http://localhost:3000/trustmark");
     expect(decodedIdToken.payload.aud).toBe(knownClientId);
     expect(decodedIdToken.payload.sid).toBe(SESSION_ID);
-    expect(decodedIdToken.payload.nonce).toBe(validAuthRequestParams.params.nonce);
+    expect(decodedIdToken.payload.nonce).toBe(
+      validAuthRequestParams.params.nonce
+    );
     expect(decodedIdToken.payload.vot).toBe(
       validAuthRequestParams.params.vtr.credentialTrust
     );

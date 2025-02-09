@@ -26,7 +26,7 @@ describe("createIdToken tests", () => {
         credentialTrust: "Cl.Cm",
         levelOfConfidence: null,
       },
-    }
+    },
   };
   const testTimestampMs = 1723707024;
   const testClientId = "testClientId";
@@ -178,7 +178,9 @@ describe("createIdToken tests", () => {
     const idToken = await createIdToken(mockAuthRequestParams, testAccessToken);
 
     const payload = decodeTokenPart(idToken.split(".")[1]);
-    expect(payload.vot).not.toEqual(mockAuthRequestParams.params.vtr.credentialTrust);
+    expect(payload.vot).not.toEqual(
+      mockAuthRequestParams.params.vtr.credentialTrust
+    );
     expect(payload.vot).toBe("Cl");
   });
 

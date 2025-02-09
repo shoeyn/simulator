@@ -1151,7 +1151,7 @@ describe("Auth requests using request objects", () => {
         response_type: "code",
         scope: "openid email",
         request: await encodedJwtWithParams({}),
-        sub: "testSub"
+        sub: "testSub",
       });
       const response = await request(app).get(
         authoriseEndpoint + "?" + requestParams

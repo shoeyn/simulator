@@ -22,8 +22,13 @@ export const configController = (
   if (req.body.clientConfiguration !== undefined) {
     populateClientConfiguration(req.body.clientConfiguration);
   }
-  if (req.body.responseConfiguration !== undefined && req.body.responseConfiguration.sub !== undefined) {
-    const userConfig = Config.getUserConfiguration(req.body.responseConfiguration.sub);
+  if (
+    req.body.responseConfiguration !== undefined &&
+    req.body.responseConfiguration.sub !== undefined
+  ) {
+    const userConfig = Config.getUserConfiguration(
+      req.body.responseConfiguration.sub
+    );
     populateResponseConfiguration(userConfig, req.body.responseConfiguration);
     populateErrorConfiguration(userConfig, req.body.errorConfiguration);
   }
@@ -89,7 +94,10 @@ const populateResponseConfiguration = (
     config.setPhoneNumber(userConfig, responseConfiguration.phoneNumber);
   }
   if (responseConfiguration.phoneNumberVerified !== undefined) {
-    config.setPhoneNumberVerified(userConfig, responseConfiguration.phoneNumberVerified);
+    config.setPhoneNumberVerified(
+      userConfig,
+      responseConfiguration.phoneNumberVerified
+    );
   }
   if (responseConfiguration.maxLoCAchieved !== undefined) {
     config.setMaxLoCAchieved(userConfig, responseConfiguration.maxLoCAchieved);
@@ -101,10 +109,16 @@ const populateResponseConfiguration = (
     );
   }
   if (responseConfiguration.passportDetails !== undefined) {
-    config.setPassportDetails(userConfig, responseConfiguration.passportDetails);
+    config.setPassportDetails(
+      userConfig,
+      responseConfiguration.passportDetails
+    );
   }
   if (responseConfiguration.drivingPermitDetails !== undefined) {
-    config.setDrivingPermitDetails(userConfig, responseConfiguration.drivingPermitDetails);
+    config.setDrivingPermitDetails(
+      userConfig,
+      responseConfiguration.drivingPermitDetails
+    );
   }
   if (responseConfiguration.socialSecurityRecordDetails !== undefined) {
     config.setSocialSecurityRecordDetails(
@@ -113,7 +127,10 @@ const populateResponseConfiguration = (
     );
   }
   if (responseConfiguration.postalAddressDetails !== undefined) {
-    config.setPostalAddressDetails(userConfig, responseConfiguration.postalAddressDetails);
+    config.setPostalAddressDetails(
+      userConfig,
+      responseConfiguration.postalAddressDetails
+    );
   }
   if (responseConfiguration.returnCodes !== undefined) {
     config.setReturnCodes(userConfig, responseConfiguration.returnCodes);

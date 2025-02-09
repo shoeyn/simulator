@@ -33,7 +33,8 @@ export const tokenController = async (
     }
 
     if (
-      authCodeParams.params.redirectUri !== parsedTokenRequest.tokenRequest.redirectUri
+      authCodeParams.params.redirectUri !==
+      parsedTokenRequest.tokenRequest.redirectUri
     ) {
       logger.warn(
         {
