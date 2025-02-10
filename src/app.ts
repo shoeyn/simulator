@@ -16,6 +16,7 @@ import { didController } from "./components/did/did-controller";
 import { logoutController } from "./components/logout/logout-controller";
 import { getConfigController } from "./components/config/get-config-controller";
 import path from "node:path";
+import { Config } from "./config";
 
 const createApp = (): Application => {
   const app: Express = express();
@@ -25,6 +26,13 @@ const createApp = (): Application => {
   app.use(dedupeQueryParams);
   app.set("views", path.join(__dirname, "views"));
   app.set("view engine", "pug");
+
+  app.use((_req, res, next) => {
+    const config = Config.getInstance();
+
+    res.locals.simUrl = config.getSimulatorUrl();
+    next();
+  });
 
   app.use(
     "/assets",

@@ -5,13 +5,13 @@ head
 
     meta(content="noindex, nofollow, noarchive", name="robots")
 
-    link(href="/images/favicon.ico", rel="icon", sizes="48x48")
-    link(href="/images/favicon.svg", rel="icon", sizes="any", type="image/svg+xml")
-    link(color="blue", href="/images/govuk-icon-mask.svg", rel="mask-icon")
-    link(href="/images/govuk-icon-180.png", rel="apple-touch-icon")
-    meta(content="/images/govuk-opengraph-image.png", property="og:image")
+    link(href=`${simUrl}/assets/images/favicon.ico`, rel="icon", sizes="48x48")
+    link(href=`${simUrl}/assets/images/favicon.svg`, rel="icon", sizes="any", type="image/svg+xml")
+    link(color="blue", href=`${simUrl}/assets/images/govuk-icon-mask.svg`, rel="mask-icon")
+    link(href=`${simUrl}/images/govuk-icon-180.png`, rel="apple-touch-icon")
+    meta(content=`${simUrl}/assets/images/govuk-opengraph-image.png`, property="og:image")
 
-    link(rel='stylesheet', href='/assets/application.css')
+    link(rel="stylesheet", href=`${simUrl}/assets/application.css`)
 
     block extra_layout_header
 
