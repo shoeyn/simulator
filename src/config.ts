@@ -176,7 +176,7 @@ CQIDAQAB
     const i = this.getUserIndex(sub);
 
     if (i > -1) {
-      this.userConfigurations.splice(i);
+      this.userConfigurations.splice(i, 1);
     }
   }
 

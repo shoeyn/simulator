@@ -1,5 +1,8 @@
 import express, { Application, Express, Request, Response } from "express";
-import { configController } from "./components/config/config-controller";
+import {
+  configController,
+  deleteConfig,
+} from "./components/config/config-controller";
 import { tokenController } from "./components/token/token-controller";
 import { authoriseController } from "./components/authorise/authorise-get-controller";
 import { dedupeQueryParams } from "./middleware/dedupe-query-params";
@@ -53,6 +56,7 @@ const createApp = (): Application => {
     configController
   );
   app.get("/config", getConfigController);
+  app.get("/config/delete/:sub", deleteConfig);
   app.post("/token", tokenController);
   app.get("/userinfo", userInfoController);
   app.get("/trustmark", trustmarkController);

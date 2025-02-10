@@ -1,2 +1,2 @@
-pnpm run check:lint
-pnpm run check:pretty
+npm run check:lint
+npm run check:pretty

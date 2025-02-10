@@ -38,6 +38,15 @@ export const configController = (
   res.status(200).send();
 };
 
+export const deleteConfig = (req: Request, res: Response): void => {
+  const config = Config.getInstance();
+  const sub = req.params.sub;
+
+  config.deleteUserConfiguration(sub);
+
+  res.status(200).send();
+};
+
 const populateClientConfiguration = (
   clientConfiguration: ClientConfiguration
 ) => {
