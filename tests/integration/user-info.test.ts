@@ -454,6 +454,7 @@ describe("/userinfo endpoint with identity verification enabled", () => {
       .post("/config")
       .send({
         responseConfiguration: {
+          sub: KNOWN_SUB_CLAIM,
           coreIdentityVerifiableCredentials: EXAMPLE_VERIFIABLE_CREDENTIAL,
           returnCodes: EXAMPLE_RETURN_CODE,
         },
@@ -530,6 +531,7 @@ describe("/userinfo endpoint with identity verification enabled", () => {
       .post("/config")
       .send({
         responseConfiguration: {
+          sub: KNOWN_SUB_CLAIM,
           coreIdentityVerifiableCredentials: EXAMPLE_VERIFIABLE_CREDENTIAL,
         },
         errorConfiguration: {
@@ -550,7 +552,7 @@ describe("/userinfo endpoint with identity verification enabled", () => {
 
     const coreIdentityJwt =
       response.body["https://vocab.account.gov.uk/v1/coreIdentityJWT"];
-    const { protectedHeader } = await decodeJwtNoVerify(coreIdentityJwt);
+    const { protectedHeader } = decodeJwtNoVerify(coreIdentityJwt);
     expect(protectedHeader.alg).not.toEqual("ES256");
   });
 
@@ -576,6 +578,7 @@ describe("/userinfo endpoint with identity verification enabled", () => {
       .post("/config")
       .send({
         responseConfiguration: {
+          sub: KNOWN_SUB_CLAIM,
           coreIdentityVerifiableCredentials: EXAMPLE_VERIFIABLE_CREDENTIAL,
         },
         errorConfiguration: {
@@ -622,6 +625,7 @@ describe("/userinfo endpoint with identity verification enabled", () => {
       .post("/config")
       .send({
         responseConfiguration: {
+          sub: KNOWN_SUB_CLAIM,
           coreIdentityVerifiableCredentials: EXAMPLE_VERIFIABLE_CREDENTIAL,
         },
         errorConfiguration: {
@@ -669,6 +673,7 @@ describe("/userinfo endpoint with identity verification enabled", () => {
       .post("/config")
       .send({
         responseConfiguration: {
+          sub: KNOWN_SUB_CLAIM,
           coreIdentityVerifiableCredentials: EXAMPLE_VERIFIABLE_CREDENTIAL,
         },
         errorConfiguration: {
@@ -716,6 +721,7 @@ describe("/userinfo endpoint with identity verification enabled", () => {
       .post("/config")
       .send({
         responseConfiguration: {
+          sub: KNOWN_SUB_CLAIM,
           coreIdentityVerifiableCredentials: EXAMPLE_VERIFIABLE_CREDENTIAL,
         },
         errorConfiguration: {
@@ -765,6 +771,7 @@ describe("/userinfo endpoint with identity verification enabled", () => {
       .post("/config")
       .send({
         responseConfiguration: {
+          sub: KNOWN_SUB_CLAIM,
           coreIdentityVerifiableCredentials: EXAMPLE_VERIFIABLE_CREDENTIAL,
         },
         errorConfiguration: {
@@ -785,7 +792,7 @@ describe("/userinfo endpoint with identity verification enabled", () => {
 
     const coreIdentityJwt =
       response.body["https://vocab.account.gov.uk/v1/coreIdentityJWT"];
-    const { payload } = await decodeJwtNoVerify(coreIdentityJwt);
+    const { payload } = decodeJwtNoVerify(coreIdentityJwt);
     const nowSeconds = Math.floor(Date.now() / 1000);
     expect(payload.exp).toBeLessThan(nowSeconds);
   });

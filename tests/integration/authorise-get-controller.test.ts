@@ -439,6 +439,7 @@ describe("Auth requests using query params", () => {
         scope: "openid email",
         state,
         nonce,
+        sub: Config.getInstance().getUserConfigurations()[0].response.sub!,
       });
       const response = await request(app).get(
         authoriseEndpoint + "?" + requestParams
@@ -460,6 +461,7 @@ describe("Auth requests using query params", () => {
         scope: "openid email",
         state,
         nonce,
+        sub: Config.getInstance().getUserConfigurations()[0].response.sub!,
       });
       const response = await request(app).get(
         authoriseEndpoint + "?" + requestParams
@@ -480,6 +482,7 @@ describe("Auth requests using query params", () => {
         response_type: "code",
         scope: "openid email",
         state,
+        sub: Config.getInstance().getUserConfigurations()[0].response.sub!,
         claims:
           '{"userinfo":{"https://vocab.account.gov.uk/v1/coreIdentityJWT":null}}',
         nonce,
@@ -503,6 +506,7 @@ describe("Auth requests using query params", () => {
         response_type: "code",
         scope: "openid email",
         state,
+        sub: Config.getInstance().getUserConfigurations()[0].response.sub!,
         claims:
           '{"userinfo":{"https://vocab.account.gov.uk/v1/coreIdentityJWT":null}}',
         nonce,
@@ -527,6 +531,7 @@ describe("Auth requests using query params", () => {
         response_type: "code",
         scope: "openid email",
         state,
+        sub: Config.getInstance().getUserConfigurations()[0].response.sub!,
         claims:
           '{"userinfo":{"https://vocab.account.gov.uk/v1/coreIdentityJWT":null}}',
         nonce,
@@ -1179,6 +1184,7 @@ describe("Auth requests using request objects", () => {
         redirect_uri: knownRedirectUri,
         response_type: "code",
         scope: "openid email",
+        sub: Config.getInstance().getUserConfigurations()[0].response.sub!,
         request: await encodedJwtWithParams({}),
       });
       const response = await request(app).get(
@@ -1197,6 +1203,7 @@ describe("Auth requests using request objects", () => {
         redirect_uri: knownRedirectUri,
         response_type: "code",
         scope: "openid email",
+        sub: Config.getInstance().getUserConfigurations()[0].response.sub!,
         request: await encodedJwtWithParams({
           max_age: 123,
           prompt: "login",
