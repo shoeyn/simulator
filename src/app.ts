@@ -30,7 +30,7 @@ const createApp = (): Application => {
   app.use((_req, res, next) => {
     const config = Config.getInstance();
 
-    res.locals.simUrl = process.env.PROXY_URL ?? config.getSimulatorUrl();
+    res.locals.simUrl = process.env.SIM_PROXY_URL ?? config.getSimulatorUrl();
     next();
   });
 
