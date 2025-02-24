@@ -16,6 +16,7 @@ import { didController } from "./components/did/did-controller";
 import { logoutController } from "./components/logout/logout-controller";
 import { getConfigController } from "./components/config/get-config-controller";
 import path from "node:path";
+import { Config } from "./config";
 
 const createApp = (): Application => {
   const app: Express = express();
@@ -26,8 +27,10 @@ const createApp = (): Application => {
   app.set("views", path.join(__dirname, "views"));
   app.set("view engine", "pug");
 
-  app.use((req, res, next) => {
-    res.locals.simUrl = req.baseUrl;
+  app.use((_req, res, next) => {
+    const config = Config.getInstance();
+
+    res.locals.simUrl = process.env.PROXY_URL ?? config.getSimulatorUrl();
     next();
   });
 
