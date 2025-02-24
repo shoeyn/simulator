@@ -23,13 +23,17 @@ export const authoriseController = async (
   const config = Config.getInstance();
 
   try {
-    let parsedAuthRequest;
+    let parsedAuthRequest,
+      params = req.query;
+    if (req.query.form) {
+      params = parseFormRequest(params);
+    }
 
     if (req.method === "GET") {
       parsedAuthRequest = parseAuthRequest(
         //We can safely cast this type as our middleware will handle
         //any duplicate query params
-        req.query as Record<string, string>
+        params as Record<string, string>
       );
     } else {
       throw new MethodNotAllowedError(req.method);
@@ -65,7 +69,7 @@ export const authoriseController = async (
 
     if (!parsedAuthRequest.sub) {
       logger.info("Current form: " + JSON.stringify(parsedAuthRequest));
-      res.render("get-sub", parsedAuthRequest);
+      res.render("get-sub", prepareForForm(parsedAuthRequest));
       return;
     }
 
@@ -146,4 +150,39 @@ const handleRequestError = (
       message: "Internal Server Error",
     });
   }
+};
+
+const prepareForForm = (params: object) => {
+  return Object.fromEntries(
+    Object.entries(params).map(([key, val]) => {
+      if (key === "scope") {
+        return [key, val.join(" ")];
+      } else if (key === "vtr") {
+        return [key, val[0]["credentialTrust"]];
+      } else if (Array.isArray(val)) {
+        return [key, val.join(",")];
+      }
+      return [key, JSON.stringify(val)?.replaceAll('"', "")];
+    })
+  );
+};
+
+const parseFormRequest = (params: object) => {
+  return Object.fromEntries(
+    Object.entries(params).map(([key, val]) => {
+      if (key === "vtr") {
+        return [key, '["' + val + '"]'];
+      } else if (key === "claims") {
+        const out = val.split(",");
+        const claims: { userinfo: { [k: string]: null } } = {
+          userinfo: {},
+        };
+        out.forEach((element: string) => {
+          claims.userinfo[element] = null;
+        });
+        return [key, JSON.stringify(claims)];
+      }
+      return [key, val];
+    })
+  );
 };

@@ -17,6 +17,11 @@ import { logoutController } from "./components/logout/logout-controller";
 import { getConfigController } from "./components/config/get-config-controller";
 import path from "node:path";
 import { Config } from "./config";
+import dotenv from "dotenv";
+
+if (process.env.JEST_WORKER_ID === undefined) {
+  dotenv.config();
+}
 
 const createApp = (): Application => {
   const app: Express = express();

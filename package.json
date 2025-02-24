@@ -26,6 +26,7 @@
   },
   "dependencies": {
     "copyfiles": "^2.4.1",
+    "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "express-validator": "^7.2.0",
     "govuk-frontend": "^5.8.0",
