@@ -1155,8 +1155,9 @@ describe("Auth requests using request objects", () => {
         redirect_uri: knownRedirectUri,
         response_type: "code",
         scope: "openid email",
-        request: await encodedJwtWithParams({}),
-        sub: "testSub",
+        request: await encodedJwtWithParams({
+          sub: "testSub",
+        }),
       });
       const response = await request(app).get(
         authoriseEndpoint + "?" + requestParams
@@ -1184,8 +1185,7 @@ describe("Auth requests using request objects", () => {
         redirect_uri: knownRedirectUri,
         response_type: "code",
         scope: "openid email",
-        sub: Config.getInstance().getUserConfigurations()[0].response.sub!,
-        request: await encodedJwtWithParams({}),
+        request: await encodedJwtWithParams({sub: Config.getInstance().getUserConfigurations()[0].response.sub!}),
       });
       const response = await request(app).get(
         authoriseEndpoint + "?" + requestParams
@@ -1203,9 +1203,9 @@ describe("Auth requests using request objects", () => {
         redirect_uri: knownRedirectUri,
         response_type: "code",
         scope: "openid email",
-        sub: Config.getInstance().getUserConfigurations()[0].response.sub!,
         request: await encodedJwtWithParams({
           max_age: 123,
+          sub: Config.getInstance().getUserConfigurations()[0].response.sub!,
           prompt: "login",
           claims:
             '{"userinfo": { "https://vocab.account.gov.uk/v1/coreIdentityJWT": { "essential": true }}}',

@@ -64,7 +64,7 @@ export const authoriseController = async (
     }
 
     if (!parsedAuthRequest.sub) {
-      logger.info("Current form: " + JSON.stringify(parseAuthRequest));
+      logger.info("Current form: " + JSON.stringify(parsedAuthRequest));
       res.render("get-sub", parsedAuthRequest);
       return;
     }

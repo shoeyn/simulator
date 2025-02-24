@@ -146,6 +146,7 @@ export const parseAuthRequest = (
     max_age,
     request_uri: authRequest.request_uri,
     requestObject,
+    sub: authRequest.sub ?? null
   };
 };
 

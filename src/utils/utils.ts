@@ -69,6 +69,7 @@ export const transformRequestObject = (
   const claims = payload.claims ? getClaimsKeys(payload.claims as string) : [];
   const vtr = payload.vtr as VectorOfTrust[];
   const ui_locales = payload.ui_locales;
+  const sub = payload.sub;
   let prompt = [];
   try {
     prompt = parsePrompts(
@@ -93,6 +94,7 @@ export const transformRequestObject = (
     vtr,
     prompt,
     ui_locales,
+    sub,
     max_age,
   } as AuthRequest;
 };
