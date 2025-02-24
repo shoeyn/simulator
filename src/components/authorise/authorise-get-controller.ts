@@ -63,12 +63,13 @@ export const authoriseController = async (
       });
     }
 
-    if (!req.query.sub) {
-      res.render("get-sub", req.query);
+    if (!parsedAuthRequest.sub) {
+      logger.info("Current form: " + JSON.stringify(parseAuthRequest));
+      res.render("get-sub", parsedAuthRequest);
       return;
     }
 
-    const userIndex = config.getUserIndex(req.query.sub as string);
+    const userIndex = config.getUserIndex(parsedAuthRequest.sub);
 
     if (config.getAuthoriseErrors(userIndex).includes("ACCESS_DENIED")) {
       logger.warn("Client configured to return access_denied error response");
@@ -84,7 +85,7 @@ export const authoriseController = async (
 
     const authCode = generateAuthCode();
     config.addToAuthCodeRequestParamsStore(authCode, {
-      sub: req.query.sub as string,
+      sub: parsedAuthRequest.sub as string,
       params: {
         claims: parsedAuthRequest.claims,
         nonce: parsedAuthRequest.nonce,

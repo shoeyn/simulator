@@ -33,6 +33,7 @@ export type AuthRequest = {
   max_age: number;
   request_uri?: string;
   requestObject?: RequestObject;
+  sub?: string;
 };
 
 export const parseAuthRequest = (
