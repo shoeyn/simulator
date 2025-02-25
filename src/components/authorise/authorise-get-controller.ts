@@ -23,13 +23,16 @@ export const authoriseController = async (
   const config = Config.getInstance();
 
   try {
-    let parsedAuthRequest,
-      params = req.query;
-    if (req.query.form) {
-      params = parseFormRequest(params);
-    }
+    let parsedAuthRequest;
 
     if (req.method === "GET") {
+      parsedAuthRequest = parseAuthRequest(
+        //We can safely cast this type as our middleware will handle
+        //any duplicate query params
+        req.query as Record<string, string>
+      );
+    } else if (req.method === "POST") {
+      const params = parseFormRequest(req.body);
       parsedAuthRequest = parseAuthRequest(
         //We can safely cast this type as our middleware will handle
         //any duplicate query params
